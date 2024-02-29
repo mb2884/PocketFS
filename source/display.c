@@ -31,18 +31,15 @@ int main(void) {
 	// /x1b[line;columnH
 	iprintf("\x1b[2J");
 
-  File* myFile = createFile("example.txt", 100);
-  writeFile(myFile, "Hello, world!\nThis is fucking amazing\n-Matthew");
-  closeFile(myFile);
-  myFile = openFile("example.txt");
-  char buffer[100];
-  while (fgets(buffer, sizeof(buffer), myFile)) {
-    printf("%s", buffer);
-  }
-  closeFile(myFile);
-//  printf("File created successfully.\n");
-//  free(myFile);
+  File* myFile = createFile("example.txt");
   
+  writeFile(myFile, "Hello, ");
+  writeFile(myFile, "world!");
+
+  printf("File content: %s\n", myFile->data);
+
+  closeFile(myFile);
+
   do {
 		int keys_pressed;
 		

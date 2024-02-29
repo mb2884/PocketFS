@@ -1,31 +1,36 @@
 #include "file.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-// Create a file object
-File* createFile(const char* name, int size) {
+File* createFile(const char* name) {
     File* file = (File*)malloc(sizeof(File));
     if (file) {
         file->name = name;
-        file->size = size;
-        file->position = 0;
+        file->data = NULL;
+        file->size = 0;
+        file->capacity = 0;
     }
     return file;
 }
 
-// Open a file for writing
-File* openFile(const char* name) {
-    // For simplicity, we'll assume that the file exists on the FAT filesystem
-    // and we'll just create a File structure to represent it
-    int size = 0; // Dummy size for now
-    return createFile(name, size);
-}
-
-// Write to a file
 void writeFile(File* file, const char* data) {
-    // For simplicity, we'll just print the data to stdout
-    printf("%s\n", data);
+    int dataLength = strlen(data);
+    if (file->size + dataLength >= file->capacity) {
+        int newCapacity = file->capacity + dataLength + 1;
+        char* newData = (char*)realloc(file->data, newCapacity);
+        if (!newData) {
+            fprintf(stderr, "Failed to allocate memory for file data\n");
+            return;
+        }
+        file->data = newData;
+        file->capacity = newCapacity;
+    }
+    strcpy(file->data + file->size, data);
+    file->size += dataLength;
 }
 
-// Close a file
 void closeFile(File* file) {
+    free(file->data);
     free(file);
 }
