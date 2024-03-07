@@ -13,15 +13,18 @@
 
 #define MAX_ITEMS 16
 
+// Function prototypes
+void setup();
+Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIsFile);
+
+// Initialization function
 void setup()
 {
-  // the vblank interrupt must be enabled for VBlankIntrWait() to work
-  // since the default dispatcher handles the bios flags no vblank handler
-  // is required
-
+  // Enable VBlank interrupt for VBlankIntrWait() to work
   irqInit();
   irqEnable(IRQ_VBLANK);
 
+  // Initialize console
   consoleDemoInit();
 
   // Set background color to dark grey
@@ -41,7 +44,7 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
   printf("Contents of '%s':\n", directory->name);
 
   // Calculate total number of items
-  int totalItems = directory->num_subdirectories + directory->num_files;
+  // int totalItems = directory->num_subdirectories + directory->num_files;
 
   // Print subdirectories
   printf("Subdirectories:\n");
@@ -78,28 +81,25 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
   return directory;
 }
 
-//---------------------------------------------------------------------------------
 // Program entry point
-//---------------------------------------------------------------------------------
 int main(void)
 {
+  // Initialize
   setup();
-  // testDirectoryOperations();
-  // testFileOperations();
 
   // Create root directory
   Directory *rootDir = createDirectory("root", NULL);
 
-  // Create subdirectories manually
-  Directory *subDir1 = createDirectory("dir1", rootDir);
-  Directory *subDir2 = createDirectory("dir2", rootDir);
-  Directory *subDir3 = createDirectory("dir3", rootDir);
-  Directory *subDir4 = createDirectory("dir4", rootDir);
-  Directory *subDir5 = createDirectory("dir5", rootDir);
+  // Create subdirectories and files manually
+  createDirectory("dir1", rootDir);
+  createDirectory("dir2", rootDir);
+  createDirectory("dir3", rootDir);
+  createDirectory("dir4", rootDir);
+  createDirectory("dir5", rootDir);
 
-  File *file1 = createFile("file1.txt", rootDir);
-  File *file2 = createFile("file2.txt", rootDir);
-  File *file3 = createFile("file3.txt", rootDir);
+  createFile("file1.txt", rootDir);
+  createFile("file2.txt", rootDir);
+  createFile("file3.txt", rootDir);
 
   int cursorPosition = 0;
   Directory *currentDirectory = rootDir;
@@ -123,15 +123,15 @@ int main(void)
     // Get keys when both pressed and held
     int keys_pressed = keysDown();
 
-    if (keys_pressed & KEY_DOWN)
+    if (keys_pressed & KEY_DOWN) // Scroll down
     {
       cursorPosition = (cursorPosition + 1) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
     }
-    else if (keys_pressed & KEY_UP)
+    else if (keys_pressed & KEY_UP) // SCroll up
     {
       cursorPosition = (cursorPosition - 1 + (currentDirectory->num_subdirectories + currentDirectory->num_files)) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
     }
-    else if (keys_pressed & KEY_LEFT)
+    else if (keys_pressed & KEY_LEFT) // Go back 'out of' a dir
     {
       // Navigate back to the parent directory if not already in the root directory
       if (currentDirectory->parentDirectory != NULL)
@@ -140,7 +140,7 @@ int main(void)
         cursorPosition = 0; // Reset cursor position to the first subdirectory
       }
     }
-    else if (keys_pressed & KEY_RIGHT)
+    else if (keys_pressed & KEY_RIGHT) // Go forward 'into' a file/dir
     {
       // Check if a subdirectory is highlighted
       if (selectedIsFile)
@@ -160,18 +160,18 @@ int main(void)
       // Create a new directory within the current directory
       if (totalEntries < MAX_ITEMS)
       {
-        Directory *newDir = createDirectory("new_dir", currentDirectory);
+        createDirectory("new_dir", currentDirectory);
       }
     }
-    else if (keys_pressed & KEY_SELECT)
+    else if (keys_pressed & KEY_A)
     {
       // Create a new file within the current directory
       if (totalEntries < MAX_ITEMS)
       {
-        File *newFile = createFile("new_file.txt", currentDirectory);
+        createFile("new_file.txt", currentDirectory);
       }
     }
-    else if (keys_pressed & KEY_A)
+    else if (keys_pressed & KEY_SELECT)
     {
       // Check if a subdirectory or file is highlighted
       if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories)
