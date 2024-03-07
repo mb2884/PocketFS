@@ -11,6 +11,8 @@
 #include "test.h"
 #include "display.h"
 
+#define MAX_DIRECTORIES 16
+
 void setup()
 {
   // the vblank interrupt must be enabled for VBlankIntrWait() to work
@@ -66,34 +68,11 @@ int main(void)
   Directory *rootDir = createDirectory("root", NULL);
 
   // Create subdirectories manually
- Directory *subDir1 = createDirectory("dir1", rootDir);
-    Directory *subDir2 = createDirectory("dir2", rootDir);
-    Directory *subDir3 = createDirectory("dir3", rootDir);
-    Directory *subDir4 = createDirectory("dir4", rootDir);
-    Directory *subDir5 = createDirectory("dir5", rootDir);
-    Directory *subDir6 = createDirectory("dir6", rootDir);
-    Directory *subDir7 = createDirectory("dir7", rootDir);
-    Directory *subDir8 = createDirectory("dir8", rootDir);
-    Directory *subDir9 = createDirectory("dir9", rootDir);
-    Directory *subDir10 = createDirectory("dir10", rootDir);
-    Directory *subDir11 = createDirectory("dir11", rootDir);
-    Directory *subDir12 = createDirectory("dir12", rootDir);
-    Directory *subDir13 = createDirectory("dir13", rootDir);
-    Directory *subDir14 = createDirectory("dir14", rootDir);
-    Directory *subDir15 = createDirectory("dir15", rootDir);
-    Directory *subDir16 = createDirectory("dir16", rootDir);
-    Directory *subDir17 = createDirectory("dir17", rootDir);
-    Directory *subDir18 = createDirectory("dir18", rootDir);
-    Directory *subDir19 = createDirectory("dir19", rootDir);
-    Directory *subDir20 = createDirectory("dir20", rootDir);
-
-
-  // clearScr();
-
-  // for (int i = 0; i < rootDir->num_subdirectories; ++i)
-  // {
-  //   printf("- %s\n", rootDir->subdirectories[i]->name);
-  // }
+  Directory *subDir1 = createDirectory("dir1", rootDir);
+  Directory *subDir2 = createDirectory("dir2", rootDir);
+  Directory *subDir3 = createDirectory("dir3", rootDir);
+  Directory *subDir4 = createDirectory("dir4", rootDir);
+  Directory *subDir5 = createDirectory("dir5", rootDir);
 
   int cursorPosition = 0;
   Directory *currentDirectory = rootDir;
@@ -118,14 +97,51 @@ int main(void)
     {
       cursorPosition = (cursorPosition - 1 + currentDirectory->num_subdirectories) % currentDirectory->num_subdirectories;
     }
-
-    if (keys_pressed & KEY_A)
+    else if (keys_pressed & KEY_LEFT)
     {
-      clearScr();
-      printf("Commands:\n");
-      printf("mkdir .... A\n");
-      printf("mkfile .... B\n");
+      // Navigate back to the parent directory if not already in the root directory
+      if (currentDirectory->parentDirectory != NULL)
+      {
+        currentDirectory = currentDirectory->parentDirectory;
+        cursorPosition = 0; // Reset cursor position to the first subdirectory
+      }
     }
+    else if (keys_pressed & KEY_RIGHT)
+    {
+      // Check if a subdirectory is highlighted
+      if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories)
+      {
+        // Set the highlighted subdirectory as the new root directory
+        currentDirectory = currentDirectory->subdirectories[cursorPosition];
+        cursorPosition = 0; // Reset cursor position to the first subdirectory
+      }
+    }
+    else if (keys_pressed & KEY_B)
+    {
+      if (currentDirectory->num_subdirectories < MAX_DIRECTORIES)
+      {
+        Directory *subDir = createDirectory("dir", currentDirectory);
+      }
+    }
+    else if (keys_pressed & KEY_A)
+    {
+      // Check if a subdirectory is highlighted
+      if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories)
+      {
+        // Delete the highlighted subdirectory
+        Directory *dirToDelete = currentDirectory->subdirectories[cursorPosition];
+        Directory *parentDirectory = dirToDelete->parentDirectory;
+        deleteDirectory(dirToDelete);
+
+        // Set the current directory to the parent directory of the deleted one
+        if (parentDirectory != NULL)
+        {
+          currentDirectory = parentDirectory;
+          cursorPosition = 0; // Reset cursor position to the first subdirectory
+        }
+      }
+    }
+
     VBlankIntrWait();
   };
 }

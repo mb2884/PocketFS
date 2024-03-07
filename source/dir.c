@@ -33,6 +33,21 @@ void deleteDirectory(Directory* directory) {
     if (!directory)
         return;
 
+    // Remove the directory from its parent's list of subdirectories
+    if (directory->parentDirectory) {
+        for (int i = 0; i < directory->parentDirectory->num_subdirectories; ++i) {
+            if (directory->parentDirectory->subdirectories[i] == directory) {
+                // Shift the remaining subdirectories to fill the gap
+                for (int j = i; j < directory->parentDirectory->num_subdirectories - 1; ++j) {
+                    directory->parentDirectory->subdirectories[j] = directory->parentDirectory->subdirectories[j + 1];
+                }
+                directory->parentDirectory->num_subdirectories--;
+                break;
+            }
+        }
+    }
+
+    // Free memory allocated for subdirectories and files
     for (int i = 0; i < directory->num_subdirectories; ++i) {
         deleteDirectory(directory->subdirectories[i]);
     }
