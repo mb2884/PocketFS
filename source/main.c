@@ -38,7 +38,7 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
     return NULL;
   }
 
-  printf("Contents of directory '%s':\n", directory->name);
+  printf("Contents of '%s':\n", directory->name);
 
   // Calculate total number of items
   int totalItems = directory->num_subdirectories + directory->num_files;
@@ -106,6 +106,9 @@ int main(void)
 
   while (1)
   {
+    // Calculate totalEntries before printing the cursor
+    int totalEntries = currentDirectory->num_subdirectories + currentDirectory->num_files;
+
     clearScr();
 
     // Flag to determine if the selected item is a file (1) or directory (0)
@@ -155,7 +158,7 @@ int main(void)
     else if (keys_pressed & KEY_B)
     {
       // Create a new directory within the current directory
-      if (currentDirectory->num_subdirectories < MAX_ITEMS)
+      if (totalEntries < MAX_ITEMS)
       {
         Directory *newDir = createDirectory("new_dir", currentDirectory);
       }
@@ -163,7 +166,7 @@ int main(void)
     else if (keys_pressed & KEY_SELECT)
     {
       // Create a new file within the current directory
-      if ((currentDirectory->num_subdirectories + currentDirectory->num_files) < MAX_ITEMS)
+      if (totalEntries < MAX_ITEMS)
       {
         File *newFile = createFile("new_file.txt", currentDirectory);
       }
@@ -179,13 +182,21 @@ int main(void)
 
         // Set the current directory to the parent directory of the deleted one
         currentDirectory = dirToDelete->parentDirectory;
-        cursorPosition--; // Reset cursor position to the first subdirectory
+        if (cursorPosition != 0)
+        {
+          cursorPosition--;
+        }
       }
-      else if (cursorPosition >= currentDirectory->num_subdirectories && cursorPosition < (currentDirectory->num_subdirectories + currentDirectory->num_files))
+      else if (cursorPosition >= currentDirectory->num_subdirectories && cursorPosition < totalEntries)
       {
         // Delete the highlighted file
         File *fileToDelete = currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories];
         deleteFile(fileToDelete);
+
+        if (cursorPosition != currentDirectory->num_subdirectories)
+        {
+          cursorPosition--;
+        }
       }
     }
 
