@@ -78,7 +78,7 @@ void insertAtPosition(File *file, const char *data, int position)
 {
     if (position < 0 || position > file->size)
     {
-        fprintf(stderr, "Invalid position for insertion\n");
+        // fprintf(stderr, "Invalid position for insertion\n");
         return;
     }
 

@@ -10,12 +10,10 @@
 #include "file.h"
 #include "dir.h"
 #include "display.h"
+#include "text_data.h"
 
 #define MAX_ITEMS 16
 #define MAX_CHARS 599
-
-void setup();
-Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIsFile);
 
 void setup()
 {
@@ -78,6 +76,41 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
   }
 
   return directory;
+}
+
+void importFiles(Directory *rootDir)
+{
+  if (text_data[0] != '\0')
+  {
+    if (strlen(text_data) > MAX_CHARS)
+    {
+      int numFiles = strlen(text_data) / MAX_CHARS;
+      int remainingChars = strlen(text_data) % MAX_CHARS;
+      for (int i = 0; i < numFiles; i++)
+      {
+        if (rootDir->num_files + rootDir->num_subdirectories >= MAX_ITEMS)
+        {
+          break;
+        }
+        char *fileData = (char *)malloc(MAX_CHARS + 1);
+        strlcpy(fileData, text_data + i * MAX_CHARS, MAX_CHARS + 1);
+        File *file = createFile("user.txt", rootDir);
+        writeFile(file, fileData);
+      }
+      if (remainingChars > 0)
+      {
+        char *fileData = (char *)malloc(remainingChars + 1);
+        strlcpy(fileData, text_data + numFiles * MAX_CHARS, remainingChars + 1);
+        File *file = createFile("user.txt", rootDir);
+        writeFile(file, fileData);
+      }
+    }
+    else
+    {
+      File *file = createFile("user.txt", rootDir);
+      writeFile(file, text_data);
+    }
+  }
 }
 
 void editFile(File *file)
@@ -150,39 +183,59 @@ void editFile(File *file)
         cursorPosition = 0; // Prevent moving above the first line
       }
     }
-    else if (keys_pressed & KEY_DOWN && file->size < MAX_CHARS)
+    else if (keys_pressed & KEY_DOWN)
     {
-      cursorPosition += 30;
-      if (cursorPosition > file->size)
+      for (int i = 0; i < 30; i++)
       {
-        cursorPosition = file->size; // Prevent moving below the last line
+        if (cursorPosition >= MAX_CHARS)
+        {
+          cursorPosition = MAX_CHARS; // Prevent moving below the last line
+        }
+        if (cursorPosition < file->size)
+        {
+          cursorPosition++; // Move cursor right by one character
+        }
+        else
+        {
+          if (file->size < MAX_CHARS)
+          {
+            insertAtPosition(file, " ", cursorPosition);
+          }
+          cursorPosition++;
+        }
+      }
+      // cursorPosition += 30;
+      // if (cursorPosition > file->size)
+      // {
+      //   cursorPosition = file->size; // Prevent moving below the last line
+      // }
+    }
+    else if (keys_pressed & KEY_LEFT && file->data != NULL)
+    {
+      if (cursorPosition > 0)
+      {
+        cursorPosition--; // Move cursor left by one character
       }
     }
-  else if (keys_pressed & KEY_LEFT && file->data != NULL)
-  {
-    if (cursorPosition > 0)
+    else if (keys_pressed & KEY_RIGHT)
     {
-      cursorPosition--; // Move cursor left by one character
+      if (cursorPosition < file->size)
+      {
+        cursorPosition++; // Move cursor right by one character
+      }
+      else
+      {
+        insertAtPosition(file, " ", cursorPosition);
+        cursorPosition++;
+      }
     }
-  }
-  else if (keys_pressed & KEY_RIGHT)
-  {
-    if (cursorPosition < file->size)
+    else if (keys_pressed & KEY_START)
     {
-      cursorPosition++; // Move cursor right by one character
+      file->cursorPosition = cursorPosition;
+      break;
     }
-    else
-    {
-      insertAtPosition(file, " ", cursorPosition);
-    }
+    VBlankIntrWait();
   }
-  else if (keys_pressed & KEY_START)
-  {
-    file->cursorPosition = cursorPosition;
-    break;
-  }
-  VBlankIntrWait();
-}
 }
 
 int main(void)
@@ -193,15 +246,18 @@ int main(void)
   Directory *rootDir = createDirectory("root", NULL);
 
   // Create subdirectories and files manually
-  createDirectory("dir1", rootDir);
-  createDirectory("dir2", rootDir);
-  createDirectory("dir3", rootDir);
-  createDirectory("dir4", rootDir);
-  createDirectory("dir5", rootDir);
+  // createDirectory("dir1", rootDir);
+  // createDirectory("dir2", rootDir);
+  // createDirectory("dir3", rootDir);
+  // createDirectory("dir4", rootDir);
+  // createDirectory("dir5", rootDir);
 
-  createFile("file1.txt", rootDir);
-  createFile("file2.txt", rootDir);
-  createFile("file3.txt", rootDir);
+  // createFile("file1.txt", rootDir);
+  // createFile("file2.txt", rootDir);
+  // createFile("file3.txt", rootDir);
+
+  // TODO check if text_data > 500 chars, if so, split into multiple files.
+  importFiles(rootDir);
 
   int cursorPosition = 0;
   Directory *currentDirectory = rootDir;
