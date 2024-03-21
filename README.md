@@ -35,8 +35,8 @@ If using the [mgba emulator](https://mgba.io/downloads.html), you can then launc
 mgba -4 pocketfs.gba
 ```
 ### Controls
-
-<img src="https://i.imgur.com/aMDGG1k.png" width="60%" align="right">
+<div>
+<img src="https://i.imgur.com/aMDGG1k.png" width="50%" align="right">
 
 <table>
     <tr>
@@ -72,6 +72,7 @@ mgba -4 pocketfs.gba
         <td>Delete highlighted directory/file</td>
     </tr>
 </table>
+</div>
 <br clear="right"/>
 
 ## Contributing
