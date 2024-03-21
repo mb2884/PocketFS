@@ -3,37 +3,46 @@
 #include "dir.h"
 #include "file.h"
 
-void printAllFiles(Directory* directory) {
-    if (!directory) {
-        printf("Invalid directory\n");
-        return;
-    }
+void printAllFiles(Directory *directory)
+{
+  if (!directory)
+  {
+    printf("Invalid directory\n");
+    return;
+  }
 
-    printf("Files in directory '%s':\n", directory->name);
-    for (int i = 0; i < directory->num_files; ++i) {
-        printf("- %s\n", directory->files[i]->name);
-    }
+  printf("Files in directory '%s':\n", directory->name);
+  for (int i = 0; i < directory->num_files; ++i)
+  {
+    printf("- %s\n", directory->files[i]->name);
+  }
 }
 
-void printAllSubdirectories(Directory* directory) {
-    if (!directory) {
-        printf("Invalid directory\n");
-        return;
-    }
+void printAllSubdirectories(Directory *directory)
+{
+  if (!directory)
+  {
+    printf("Invalid directory\n");
+    return;
+  }
 
-    printf("Subdirectories in directory '%s':\n", directory->name);
-    for (int i = 0; i < directory->num_subdirectories; ++i) {
-        printf("- %s\n", directory->subdirectories[i]->name);
-    }
+  printf("Subdirectories in directory '%s':\n", directory->name);
+  for (int i = 0; i < directory->num_subdirectories; ++i)
+  {
+    printf("- %s\n", directory->subdirectories[i]->name);
+  }
 }
 
-void printBreak() {
-  for (int i = 0; i < 30; i++) {
+void printBreak()
+{
+  for (int i = 0; i < 30; i++)
+  {
     printf("-");
   }
 }
 
-void clearScr() {
-// ansi escape sequence to clear screen and home cursor
+void clearScr()
+{
+  // ansi escape sequence to clear screen and home cursor
   iprintf("\x1b[2J");
 }

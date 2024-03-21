@@ -6,9 +6,9 @@
 #include <gba_input.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "file.h"
 #include "dir.h"
-#include "test.h"
 #include "display.h"
 
 #define MAX_ITEMS 16
@@ -79,6 +79,72 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
   return directory;
 }
 
+void editFile(File *file)
+{
+  clearScr();
+
+  char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>?/`";
+  int selectedLetter = 0;
+
+  int cursorPosition = file->cursorPosition;
+
+  while (1)
+  {
+    clearScr();
+    if (file->data != NULL)
+    {
+      printf("%s", file->data);
+    }
+
+    printf("%c", validLetters[selectedLetter]);
+
+    scanKeys();
+
+    int keys_pressed = keysDown();
+    int keys_held = keysHeld();
+
+    if (keys_pressed & KEY_R)
+    {
+      if (keys_held & KEY_SELECT)
+      {
+        selectedLetter = (selectedLetter + 26) % strlen(validLetters);
+      }
+      else
+      {
+        selectedLetter = (selectedLetter + 1) % strlen(validLetters);
+      }
+    }
+    else if (keys_pressed & KEY_L)
+    {
+      if (keys_held & KEY_SELECT)
+      {
+        selectedLetter = (selectedLetter - 26) % strlen(validLetters);
+      }
+      else
+      {
+        selectedLetter = (selectedLetter - 1 + strlen(validLetters)) % strlen(validLetters);
+      }
+    }
+    else if (keys_pressed & KEY_A)
+    {
+      char letter[2] = {validLetters[selectedLetter], '\0'};
+      insertAtPosition(file, letter, cursorPosition);
+      cursorPosition++;
+    }
+    else if (keys_pressed & KEY_B)
+    {
+      insertAtPosition(file, " ", cursorPosition);
+      cursorPosition++;
+    }
+    else if (keys_pressed & KEY_START)
+    {
+      file->cursorPosition = cursorPosition;
+      break;
+    }
+    VBlankIntrWait();
+  }
+}
+
 int main(void)
 {
   setup();
@@ -136,7 +202,7 @@ int main(void)
     {
       if (selectedIsFile)
       {
-        printf("Selected file: %s\n", currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories]->name);
+        editFile(currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories]);
       }
       else if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories)
       {

@@ -48,44 +48,34 @@ If using the [mgba emulator](https://mgba.io/downloads.html), you can then launc
 mgba -4 pocketfs.gba
 ```
 ### Controls
-<div>
+---
+
 <img src="https://i.imgur.com/aMDGG1k.png" width="50%" align="right">
 
-<table>
-    <tr>
-        <th>Button</th>
-        <th>Function</th>
-    </tr>
-    <tr>
-        <td>Down</td>
-        <td>Shift cursor down one</td>
-    </tr>
-    <tr>
-        <td>Up</td>
-        <td>Shift cursor up one</td>
-    </tr>
-    <tr>
-        <td>Left</td>
-        <td>Back out of directory</td>
-    </tr>
-    <tr>
-        <td>Right</td>
-        <td>Enter a directory/edit a file</td>
-    </tr>
-    <tr>
-        <td>B</td>
-        <td>Create a directory here</td>
-    </tr>
-    <tr>
-        <td>A</td>
-        <td>Create a file here</td>
-    </tr>
-    <tr>
-        <td>Select</td>
-        <td>Delete highlighted directory/file</td>
-    </tr>
-</table>
-</div>
+#### Within the file tree
+
+| Button  | Function                      |
+|---------|-------------------------------|
+| Down    | Shift cursor down one         |
+| Up      | Shift cursor up one           |
+| Left    | Back out of directory         |
+| Right   | Enter a directory/edit a file |
+| B       | Create a directory here       |
+| A       | Create a file here            |
+| Select  | Delete highlighted directory/file |
+
+#### Within the text editor
+
+| Button  | Function                                      |
+| ------- | -------------------------------------------- |
+| L       | Cycle selected character left                 |
+| R       | Cycle selected character right                |
+| Select  | Shift-like modifier key to skip 26 characters left or right |
+| Start   | Save and exit file                            |
+| A       | Print selected character                      |
+| B       | Print a space                                 |
+
+
 <br clear="right"/>
 
 ## Contributing
