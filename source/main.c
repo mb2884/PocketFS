@@ -12,6 +12,7 @@
 #include "display.h"
 
 #define MAX_ITEMS 16
+#define MAX_CHARS 599
 
 void setup();
 Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIsFile);
@@ -93,10 +94,15 @@ void editFile(File *file)
     clearScr();
     if (file->data != NULL)
     {
-      printf("%s", file->data);
+      printf("%.*s", cursorPosition, file->data); // Print characters up to cursor position
     }
 
-    printf("%c", validLetters[selectedLetter]);
+    printf("%c", validLetters[selectedLetter]); // Print the selected letter
+
+    if (file->data != NULL)
+    {
+      printf("%s", file->data + cursorPosition); // Print remaining part of the file
+    }
 
     scanKeys();
 
@@ -125,24 +131,58 @@ void editFile(File *file)
         selectedLetter = (selectedLetter - 1 + strlen(validLetters)) % strlen(validLetters);
       }
     }
-    else if (keys_pressed & KEY_A)
+    else if (keys_pressed & KEY_A && file->size < MAX_CHARS)
     {
       char letter[2] = {validLetters[selectedLetter], '\0'};
       insertAtPosition(file, letter, cursorPosition);
       cursorPosition++;
     }
-    else if (keys_pressed & KEY_B)
+    else if (keys_pressed & KEY_B && file->size < MAX_CHARS)
     {
       insertAtPosition(file, " ", cursorPosition);
       cursorPosition++;
     }
-    else if (keys_pressed & KEY_START)
+    else if (keys_pressed & KEY_UP)
     {
-      file->cursorPosition = cursorPosition;
-      break;
+      cursorPosition -= 30; // Move cursor up a line
+      if (cursorPosition < 0)
+      {
+        cursorPosition = 0; // Prevent moving above the first line
+      }
     }
-    VBlankIntrWait();
+    else if (keys_pressed & KEY_DOWN && file->size < MAX_CHARS)
+    {
+      cursorPosition += 30;
+      if (cursorPosition > file->size)
+      {
+        cursorPosition = file->size; // Prevent moving below the last line
+      }
+    }
+  else if (keys_pressed & KEY_LEFT && file->data != NULL)
+  {
+    if (cursorPosition > 0)
+    {
+      cursorPosition--; // Move cursor left by one character
+    }
   }
+  else if (keys_pressed & KEY_RIGHT)
+  {
+    if (cursorPosition < file->size)
+    {
+      cursorPosition++; // Move cursor right by one character
+    }
+    else
+    {
+      insertAtPosition(file, " ", cursorPosition);
+    }
+  }
+  else if (keys_pressed & KEY_START)
+  {
+    file->cursorPosition = cursorPosition;
+    break;
+  }
+  VBlankIntrWait();
+}
 }
 
 int main(void)

@@ -62,9 +62,9 @@ void appendFile(File *file, const char *data)
     {
         int newCapacity = file->capacity + dataLength + 1;
         char *newData = (char *)realloc((void *)file->data, newCapacity);
-        if (!newData)
+        if (!newData || strlen(file->data) > 599)
         {
-            fprintf(stderr, "Failed to allocate memory for file data\n");
+            // fprintf(stderr, "Failed to allocate memory for file data\n");
             return;
         }
         file->data = newData;
