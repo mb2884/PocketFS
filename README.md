@@ -17,12 +17,25 @@ The file system will allow users to store and manage files on their GBA devices,
 - Basic text editor
 
 ## Installation
-Follow the [installation guide](https://devkitpro.org/wiki/devkitPro_pacman) to set up the devkitPro tool chain for your OS. Make sure to download the **gba-dev** group package, instructions listed at the bottom of that page.
+Follow the devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started) for the latest instructions on how to set up the necessary tool chain for your OS. 
 
-Once installed, run make to compile into a .gba file.
-
+Using devkitPro Pacman install the **gba-dev** group package.
 
 ```bash
+# Linux
+sudo dkp-pacman -Sy
+sudo dkp-pacman -Syu
+sudo dkp-pacman -S gba-dev
+```
+
+Once installed, you first need to set some variables in your environment before running make to compile into a .gba file.
+
+In a bash shell:
+```bash
+# Linux
+export DEVKITARM="path to devkitARM"
+export DEVKITPRO="path to devkitPro"
+
 make
 ```
 
