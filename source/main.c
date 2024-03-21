@@ -13,11 +13,9 @@
 
 #define MAX_ITEMS 16
 
-// Function prototypes
 void setup();
 Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIsFile);
 
-// Initialization function
 void setup()
 {
   // Enable VBlank interrupt for VBlankIntrWait() to work
@@ -81,10 +79,8 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
   return directory;
 }
 
-// Program entry point
 int main(void)
 {
-  // Initialize
   setup();
 
   // Create root directory
@@ -114,50 +110,44 @@ int main(void)
     // Flag to determine if the selected item is a file (1) or directory (0)
     int selectedIsFile = 0;
 
-    // Print directory contents and allow selection
     currentDirectory = printCursor(currentDirectory, cursorPosition, &selectedIsFile);
 
-    // Get current values for keys
     scanKeys();
-
-    // Get keys when both pressed and held
     int keys_pressed = keysDown();
 
-    if (keys_pressed & KEY_DOWN) // Scroll down
+    // Handle directional input
+    if (keys_pressed & KEY_DOWN)
     {
       cursorPosition = (cursorPosition + 1) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
     }
-    else if (keys_pressed & KEY_UP) // SCroll up
+    else if (keys_pressed & KEY_UP)
     {
       cursorPosition = (cursorPosition - 1 + (currentDirectory->num_subdirectories + currentDirectory->num_files)) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
     }
-    else if (keys_pressed & KEY_LEFT) // Go back 'out of' a dir
+    else if (keys_pressed & KEY_LEFT)
     {
-      // Navigate back to the parent directory if not already in the root directory
       if (currentDirectory->parentDirectory != NULL)
       {
         currentDirectory = currentDirectory->parentDirectory;
-        cursorPosition = 0; // Reset cursor position to the first subdirectory
+        cursorPosition = 0;
       }
     }
-    else if (keys_pressed & KEY_RIGHT) // Go forward 'into' a file/dir
+    else if (keys_pressed & KEY_RIGHT)
     {
-      // Check if a subdirectory is highlighted
       if (selectedIsFile)
       {
-        // Handle file selection (navigate to edit file screen)
         printf("Selected file: %s\n", currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories]->name);
       }
       else if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories)
       {
-        // Set the highlighted subdirectory as the new root directory
         currentDirectory = currentDirectory->subdirectories[cursorPosition];
-        cursorPosition = 0; // Reset cursor position to the first subdirectory
+        cursorPosition = 0;
       }
     }
+
+    // Create new directory or file
     else if (keys_pressed & KEY_B)
     {
-      // Create a new directory within the current directory
       if (totalEntries < MAX_ITEMS)
       {
         createDirectory("new_dir", currentDirectory);
@@ -165,12 +155,12 @@ int main(void)
     }
     else if (keys_pressed & KEY_A)
     {
-      // Create a new file within the current directory
       if (totalEntries < MAX_ITEMS)
       {
         createFile("new_file.txt", currentDirectory);
       }
     }
+    // Delete directory or file
     else if (keys_pressed & KEY_SELECT)
     {
       // Check if a subdirectory or file is highlighted
@@ -193,11 +183,18 @@ int main(void)
         File *fileToDelete = currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories];
         deleteFile(fileToDelete);
 
-        if (cursorPosition != currentDirectory->num_subdirectories)
+        // if (cursorPosition != currentDirectory->num_subdirectories)
+        // {
+        //   cursorPosition--;
+        // }
+        if (cursorPosition != 0)
         {
           cursorPosition--;
         }
       }
+    }
+    else if (keys_pressed & KEY_START)
+    {
     }
 
     VBlankIntrWait();
