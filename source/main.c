@@ -182,11 +182,6 @@ int main(void)
         // Delete the highlighted file
         File *fileToDelete = currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories];
         deleteFile(fileToDelete);
-
-        // if (cursorPosition != currentDirectory->num_subdirectories)
-        // {
-        //   cursorPosition--;
-        // }
         if (cursorPosition != 0)
         {
           cursorPosition--;
