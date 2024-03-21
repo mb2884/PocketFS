@@ -34,48 +34,45 @@ If using the [mgba emulator](https://mgba.io/downloads.html), you can then launc
 ```bash
 mgba -4 pocketfs.gba
 ```
-<hr>
-
 ### Controls
 
-<div style="display: flex;">
-    <table>
-        <tr>
-            <th>Button</th>
-            <th>Function</th>
-        </tr>
-        <tr>
-            <td>Down</td>
-            <td>Shift cursor down one</td>
-        </tr>
-        <tr>
-            <td>Up</td>
-            <td>Shift cursor up one</td>
-        </tr>
-        <tr>
-            <td>Left</td>
-            <td>Back out of directory</td>
-        </tr>
-        <tr>
-            <td>Right</td>
-            <td>Enter a directory/edit a file</td>
-        </tr>
-        <tr>
-            <td>B</td>
-            <td>Create a directory here</td>
-        </tr>
-        <tr>
-            <td>A</td>
-            <td>Create a file here</td>
-        </tr>
-        <tr>
-            <td>Select</td>
-            <td>Delete highlighted directory/file</td>
-        </tr>
-    </table>
-    <img src="https://i.imgur.com/aMDGG1k.png" width="60%" style="margin-left: auto;">
-</div>
+<img src="https://i.imgur.com/aMDGG1k.png" width="60%" align="right">
 
+<table>
+    <tr>
+        <th>Button</th>
+        <th>Function</th>
+    </tr>
+    <tr>
+        <td>Down</td>
+        <td>Shift cursor down one</td>
+    </tr>
+    <tr>
+        <td>Up</td>
+        <td>Shift cursor up one</td>
+    </tr>
+    <tr>
+        <td>Left</td>
+        <td>Back out of directory</td>
+    </tr>
+    <tr>
+        <td>Right</td>
+        <td>Enter a directory/edit a file</td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td>Create a directory here</td>
+    </tr>
+    <tr>
+        <td>A</td>
+        <td>Create a file here</td>
+    </tr>
+    <tr>
+        <td>Select</td>
+        <td>Delete highlighted directory/file</td>
+    </tr>
+</table>
+<br clear="right"/>
 
 ## Contributing
 
