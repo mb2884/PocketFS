@@ -1,4 +1,4 @@
 build
-files.elf
-files.sav
+pocketfs.elf
+pocketfs.sav
 .vscode
