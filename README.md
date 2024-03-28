@@ -56,8 +56,8 @@ mgba -4 pocketfs.gba
 
 | Button  | Function                      |
 |---------|-------------------------------|
-| Down    | Shift cursor down one         |
 | Up      | Shift cursor up one           |
+| Down    | Shift cursor down one         |
 | Left    | Back out of directory         |
 | Right   | Enter a directory/edit a file |
 | B       | Create a directory here       |
@@ -66,14 +66,19 @@ mgba -4 pocketfs.gba
 
 #### Within the text editor
 
-| Button  | Function                                      |
-| ------- | -------------------------------------------- |
-| L       | Cycle selected character left                 |
-| R       | Cycle selected character right                |
-| Select  | Shift-like modifier key to skip 26 characters left or right |
-| Start   | Save and exit file                            |
-| A       | Print selected character                      |
-| B       | Print a space                                 |
+| Button        | Function                                                |
+| ------------- | ------------------------------------------------------- |
+| L             | Cycle selected character left                           |
+| R             | Cycle selected character right                          |
+| Up            | Shift cursor up one                                     |
+| Down          | Shift cursor down one                                   |
+| Left          | Shift cursor left one                                   |
+| Right         | Shift cursor right one                                  |
+| Select        | Shift-like modifier key to skip 26 characters left/right|
+| Start + Select| Save and exit file                                      |
+| A             | Print selected character                                |
+| B             | Print a space                                           |
+
 
 
 <br clear="right"/>

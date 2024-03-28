@@ -5,12 +5,12 @@ typedef struct Directory Directory;
 
 typedef struct
 {
-    char *name;
-    char *data;
-    int size;
-    int capacity;
-    int cursorPosition;
-    Directory *parentDirectory;
+	char *name;
+	char *data;
+	int size;
+	int capacity;
+	int cursorPosition;
+	Directory *parentDirectory;
 } File;
 
 File *createFile(char *name, Directory *parentDirectory);

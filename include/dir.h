@@ -6,14 +6,13 @@
 
 #include "file.h"
 
-typedef struct Directory
-{
-    const char *name;
-    struct Directory **subdirectories;
-    int num_subdirectories;
-    File **files;
-    int num_files;
-    struct Directory *parentDirectory; // Reference to the parent directory
+typedef struct Directory {
+	const char *name;
+	struct Directory **subdirectories;
+	int num_subdirectories;
+	File **files;
+	int num_files;
+	struct Directory *parentDirectory; // Reference to the parent directory
 } Directory;
 
 Directory *createDirectory(const char *name, Directory *parentDirectory);
@@ -23,5 +22,6 @@ File *getFileFromDirectory(Directory *directory, const char *filename);
 File **getAllFilesFromDirectory(Directory *directory);
 Directory **getAllSubdirectoriesFromDirectory(Directory *directory);
 void moveDirectory(Directory *directory, Directory *newParentDirectory);
+void saveDirectory(Directory *directory);
 
 #endif /* DIR_H */

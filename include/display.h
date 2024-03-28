@@ -1,8 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "file.h"
 #include "dir.h"
+#include "file.h"
 
 void printAllFiles();
 void printAllSubdirectories();
