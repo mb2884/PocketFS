@@ -43,16 +43,15 @@ void setup() {
 }
 
 // Function to print all subdirectories and files and allow selection
-Directory *printCursor(Directory *directory, int cursor_position, int *selectedIsFile) {
+void printCursor(Directory *directory, int cursor_position, int *selectedIsFile) {
 	if (!directory) {
-		// printf("Invalid directory\n");
-		return NULL;
+		printf("Invalid directory\n");
+		return;
 	}
 
-	printf("Contents of '%s':\n", directory->name);
+	clearScr();
 
-	// Calculate total number of items
-	// int totalItems = directory->subdirectory_count + directory->file_count;
+	printf("Contents of '%s':\n", directory->name);
 
 	// Print subdirectories
 	printf("Subdirectories:\n");
@@ -77,8 +76,6 @@ Directory *printCursor(Directory *directory, int cursor_position, int *selectedI
 		}
 		printf("%s\n", directory->files[i]->name);
 	}
-
-	return directory;
 }
 
 void importFiles(Directory *rootDir) {
@@ -207,26 +204,18 @@ int main(void) {
 		rootDir = createDirectory("root", NULL);
 	}
 
-	// importFiles(rootDir);
-
 	int cursor_position = 0;
 	Directory *currentDirectory = rootDir;
 
 	while (1) {
-		// Calculate totalEntries before printing the cursor
 		int totalEntries = currentDirectory->subdirectory_count + currentDirectory->file_count;
 
-		clearScr();
-
-		// Flag to determine if the selected item is a file (1) or directory (0)
 		int selectedIsFile = 0;
-
-		currentDirectory = printCursor(currentDirectory, cursor_position, &selectedIsFile);
+		printCursor(currentDirectory, cursor_position, &selectedIsFile);
 
 		scanKeys();
 		int keys_pressed = keysDown();
 
-		// Handle directional input
 		if (keys_pressed & KEY_UP) {
 			cursor_position = (cursor_position - 1 + totalEntries) % totalEntries;
 		} else if (keys_pressed & KEY_DOWN) {
@@ -243,10 +232,7 @@ int main(void) {
 				currentDirectory = currentDirectory->subdirectories[cursor_position];
 				cursor_position = 0;
 			}
-		}
-
-		// Create new directory or file
-		else if (keys_pressed & KEY_B) {
+		} else if (keys_pressed & KEY_B) {
 			if (totalEntries < MAX_ITEMS) {
 				createDirectory("new_dir", currentDirectory);
 			}
@@ -255,26 +241,23 @@ int main(void) {
 				createFile("new_file.txt", currentDirectory);
 			}
 		} else if (keys_pressed & KEY_SELECT) {
-			// Check if a subdirectory or file is highlighted
-			if (cursor_position >= 0 && cursor_position < currentDirectory->subdirectory_count) {
-				// Set the current directory to its parent directory
-				Directory *parentDirectory = currentDirectory->parent_directory;
-				if (parentDirectory != NULL) {
-					currentDirectory = parentDirectory;
+			if (cursor_position >= 0 && cursor_position < totalEntries) {
+				if (selectedIsFile) {
+					// Handle file deletion
+					deleteFile(currentDirectory->files[cursor_position - currentDirectory->subdirectory_count]);
+				} else {
+					// Handle directory deletion
+					deleteDirectory(currentDirectory->subdirectories[cursor_position]);
 				}
-
-				// Delete the highlighted subdirectory
-				Directory *dirToDelete = currentDirectory->subdirectories[cursor_position];
-				deleteDirectory(dirToDelete);
-
 				if (cursor_position != 0) {
 					cursor_position--;
 				}
 			}
 		} else if (keys_pressed & KEY_START) {
+			printf("Saving directory to SRAM...\n");
 			saveDirectory(rootDir);
 		}
 
 		VBlankIntrWait();
 	}
-};
+}
