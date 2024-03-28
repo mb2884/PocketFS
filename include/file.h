@@ -1,16 +1,16 @@
 #ifndef FILE_H
 #define FILE_H
+#define MAX_SIZE 1000
 
 typedef struct Directory Directory;
 
-typedef struct
-{
-	char *name;
-	char *data;
-	int size;
-	int capacity;
-	int cursorPosition;
-	Directory *parentDirectory;
+typedef struct {
+    char name[MAX_SIZE];
+    char data[MAX_SIZE];
+    int size;
+    int capacity;
+    int cursor_position;
+    Directory* parent_directory;
 } File;
 
 File *createFile(char *name, Directory *parentDirectory);

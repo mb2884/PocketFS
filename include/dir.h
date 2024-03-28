@@ -3,17 +3,18 @@
 
 #define MAX_SUBDIRECTORIES 128
 #define MAX_FILES 128
+#define MAX_SIZE 1000
 
 #include "file.h"
 
-typedef struct Directory {
-	const char *name;
-	struct Directory **subdirectories;
-	int num_subdirectories;
-	File **files;
-	int num_files;
-	struct Directory *parentDirectory; // Reference to the parent directory
-} Directory;
+struct Directory {
+    char name[MAX_SIZE];
+    Directory* subdirectories[MAX_SIZE];
+    File* files[MAX_SIZE];
+    int subdirectory_count;
+    int file_count;
+    Directory* parent_directory;
+};
 
 Directory *createDirectory(const char *name, Directory *parentDirectory);
 void deleteDirectory(Directory *directory);

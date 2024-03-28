@@ -15,6 +15,11 @@
 #define MAX_ITEMS 16
 #define MAX_CHARS 599
 
+// Values for changing mode
+#define SC_MODE_RAM 0x5
+#define SC_MODE_MEDIA 0x3
+#define SC_MODE_RAM_RO 0x1
+
 // Function to change memory mode
 inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
@@ -38,21 +43,21 @@ void setup() {
 }
 
 // Function to print all subdirectories and files and allow selection
-Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIsFile) {
+Directory *printCursor(Directory *directory, int cursor_position, int *selectedIsFile) {
 	if (!directory) {
-		printf("Invalid directory\n");
+		// printf("Invalid directory\n");
 		return NULL;
 	}
 
 	printf("Contents of '%s':\n", directory->name);
 
 	// Calculate total number of items
-	// int totalItems = directory->num_subdirectories + directory->num_files;
+	// int totalItems = directory->subdirectory_count + directory->file_count;
 
 	// Print subdirectories
 	printf("Subdirectories:\n");
-	for (int i = 0; i < directory->num_subdirectories; ++i) {
-		if (i == cursorPosition) {
+	for (int i = 0; i < directory->subdirectory_count; ++i) {
+		if (i == cursor_position) {
 			printf("-> ");
 			*selectedIsFile = 0; // Selected entry is a directory
 		} else {
@@ -63,8 +68,8 @@ Directory *printCursor(Directory *directory, int cursorPosition, int *selectedIs
 
 	// Print files
 	printf("Files:\n");
-	for (int i = 0; i < directory->num_files; ++i) {
-		if ((directory->num_subdirectories + i) == cursorPosition) {
+	for (int i = 0; i < directory->file_count; ++i) {
+		if ((directory->subdirectory_count + i) == cursor_position) {
 			printf("-> ");
 			*selectedIsFile = 1; // Selected entry is a file
 		} else {
@@ -82,7 +87,7 @@ void importFiles(Directory *rootDir) {
 			int numFiles = strlen(text_data) / MAX_CHARS;
 			int remainingChars = strlen(text_data) % MAX_CHARS;
 			for (int i = 0; i < numFiles; i++) {
-				if (rootDir->num_files + rootDir->num_subdirectories >= MAX_ITEMS) {
+				if (rootDir->file_count + rootDir->subdirectory_count >= MAX_ITEMS) {
 					break;
 				}
 				char *fileData = (char *)malloc(MAX_CHARS + 1);
@@ -109,18 +114,18 @@ void editFile(File *file) {
 	char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>?/`";
 	int selectedLetter = 0;
 
-	int cursorPosition = file->cursorPosition;
+	int cursor_position = file->cursor_position;
 
 	while (1) {
 		clearScr();
 		if (file->data != NULL) {
-			printf("%.*s", cursorPosition, file->data); // Print characters up to cursor position
+			printf("%.*s", cursor_position, file->data); // Print characters up to cursor position
 		}
 
 		printf("%c", validLetters[selectedLetter]); // Print the selected letter
 
 		if (file->data != NULL) {
-			printf("%s", file->data + cursorPosition); // Print remaining part of the file
+			printf("%s", file->data + cursor_position); // Print remaining part of the file
 		}
 
 		scanKeys();
@@ -142,49 +147,49 @@ void editFile(File *file) {
 			}
 		} else if (keys_pressed & KEY_A && file->size < MAX_CHARS) {
 			char letter[2] = {validLetters[selectedLetter], '\0'};
-			insertAtPosition(file, letter, cursorPosition);
-			cursorPosition++;
+			insertAtPosition(file, letter, cursor_position);
+			cursor_position++;
 		} else if (keys_pressed & KEY_B && file->size < MAX_CHARS) {
-			insertAtPosition(file, " ", cursorPosition);
-			cursorPosition++;
+			insertAtPosition(file, " ", cursor_position);
+			cursor_position++;
 		} else if (keys_pressed & KEY_START && !(keys_held & KEY_SELECT)) { // Delete character
-			if (cursorPosition > 0) {
-				cursorPosition--;
-				file->data[cursorPosition] = ' ';
+			if (cursor_position > 0) {
+				cursor_position--;
+				file->data[cursor_position] = ' ';
 			}
 		} else if (keys_pressed & KEY_UP) {
-			cursorPosition -= 30; // Move cursor up a line
-			if (cursorPosition < 0) {
-				cursorPosition = 0; // Prevent moving above the first line
+			cursor_position -= 30; // Move cursor up a line
+			if (cursor_position < 0) {
+				cursor_position = 0; // Prevent moving above the first line
 			}
 		} else if (keys_pressed & KEY_DOWN) {
 			for (int i = 0; i < 30; i++) {
-				if (cursorPosition >= MAX_CHARS) {
-					cursorPosition = MAX_CHARS; // Prevent moving below the last line
+				if (cursor_position >= MAX_CHARS) {
+					cursor_position = MAX_CHARS; // Prevent moving below the last line
 				}
-				if (cursorPosition < file->size) {
-					cursorPosition++; // Move cursor right by one character
+				if (cursor_position < file->size) {
+					cursor_position++; // Move cursor right by one character
 				} else {
 					if (file->size < MAX_CHARS) {
-						insertAtPosition(file, " ", cursorPosition);
+						insertAtPosition(file, " ", cursor_position);
 					}
-					cursorPosition++;
+					cursor_position++;
 				}
 			}
 		} else if (keys_pressed & KEY_LEFT && file->data != NULL) {
-			if (cursorPosition > 0) {
-				cursorPosition--; // Move cursor left by one character
+			if (cursor_position > 0) {
+				cursor_position--; // Move cursor left by one character
 			}
 		} else if (keys_pressed & KEY_RIGHT) {
-			if (cursorPosition < file->size) {
-				cursorPosition++; // Move cursor right by one character
+			if (cursor_position < file->size) {
+				cursor_position++; // Move cursor right by one character
 			} else {
-				insertAtPosition(file, " ", cursorPosition);
-				cursorPosition++;
+				insertAtPosition(file, " ", cursor_position);
+				cursor_position++;
 			}
 		} else if (keys_held & KEY_START && keys_held & KEY_SELECT) // Save and exit
 		{
-			file->cursorPosition = cursorPosition;
+			file->cursor_position = cursor_position;
 			break;
 		}
 		VBlankIntrWait();
@@ -195,57 +200,48 @@ int main(void) {
 	setup();
 
 	Directory *rootDir;
-	unsigned char firstByte;
-
-	// Read the first byte from memory
-	memcpy(&firstByte, (void *)0x0E000000, sizeof(unsigned char));
-
-	// If the first byte is not FF, load the directory, otherwise create a new one
-	if (firstByte != 0xFF) {
+	char *address_check = (char *)0x0E000000;
+	if (address_check[0] == 'D') {
 		rootDir = loadDirectory();
-		if (!rootDir) {
-			fprintf(stderr, "Failed to load directory\n");
-			rootDir = createDirectory("root", NULL);
-		}
 	} else {
 		rootDir = createDirectory("root", NULL);
 	}
 
 	// importFiles(rootDir);
 
-	int cursorPosition = 0;
+	int cursor_position = 0;
 	Directory *currentDirectory = rootDir;
 
 	while (1) {
 		// Calculate totalEntries before printing the cursor
-		int totalEntries = currentDirectory->num_subdirectories + currentDirectory->num_files;
+		int totalEntries = currentDirectory->subdirectory_count + currentDirectory->file_count;
 
 		clearScr();
 
 		// Flag to determine if the selected item is a file (1) or directory (0)
 		int selectedIsFile = 0;
 
-		currentDirectory = printCursor(currentDirectory, cursorPosition, &selectedIsFile);
+		currentDirectory = printCursor(currentDirectory, cursor_position, &selectedIsFile);
 
 		scanKeys();
 		int keys_pressed = keysDown();
 
 		// Handle directional input
 		if (keys_pressed & KEY_UP) {
-			cursorPosition = (cursorPosition - 1 + totalEntries) % totalEntries;
+			cursor_position = (cursor_position - 1 + totalEntries) % totalEntries;
 		} else if (keys_pressed & KEY_DOWN) {
-			cursorPosition = (cursorPosition + 1) % totalEntries;
+			cursor_position = (cursor_position + 1) % totalEntries;
 		} else if (keys_pressed & KEY_LEFT) {
-			if (currentDirectory->parentDirectory != NULL) {
-				currentDirectory = currentDirectory->parentDirectory;
-				cursorPosition = 0;
+			if (currentDirectory->parent_directory != NULL) {
+				currentDirectory = currentDirectory->parent_directory;
+				cursor_position = 0;
 			}
 		} else if (keys_pressed & KEY_RIGHT) {
 			if (selectedIsFile) {
-				editFile(currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories]);
-			} else if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories) {
-				currentDirectory = currentDirectory->subdirectories[cursorPosition];
-				cursorPosition = 0;
+				editFile(currentDirectory->files[cursor_position - currentDirectory->subdirectory_count]);
+			} else if (cursor_position >= 0 && cursor_position < currentDirectory->subdirectory_count) {
+				currentDirectory = currentDirectory->subdirectories[cursor_position];
+				cursor_position = 0;
 			}
 		}
 
@@ -258,26 +254,21 @@ int main(void) {
 			if (totalEntries < MAX_ITEMS) {
 				createFile("new_file.txt", currentDirectory);
 			}
-		}
-		// Delete directory or file
-		else if (keys_pressed & KEY_SELECT) {
+		} else if (keys_pressed & KEY_SELECT) {
 			// Check if a subdirectory or file is highlighted
-			if (cursorPosition >= 0 && cursorPosition < currentDirectory->num_subdirectories) {
+			if (cursor_position >= 0 && cursor_position < currentDirectory->subdirectory_count) {
+				// Set the current directory to its parent directory
+				Directory *parentDirectory = currentDirectory->parent_directory;
+				if (parentDirectory != NULL) {
+					currentDirectory = parentDirectory;
+				}
+
 				// Delete the highlighted subdirectory
-				Directory *dirToDelete = currentDirectory->subdirectories[cursorPosition];
+				Directory *dirToDelete = currentDirectory->subdirectories[cursor_position];
 				deleteDirectory(dirToDelete);
 
-				// Set the current directory to the parent directory of the deleted one
-				currentDirectory = dirToDelete->parentDirectory;
-				if (cursorPosition != 0) {
-					cursorPosition--;
-				}
-			} else if (cursorPosition >= currentDirectory->num_subdirectories && cursorPosition < totalEntries) {
-				// Delete the highlighted file
-				File *fileToDelete = currentDirectory->files[cursorPosition - currentDirectory->num_subdirectories];
-				deleteFile(fileToDelete);
-				if (cursorPosition != 0) {
-					cursorPosition--;
+				if (cursor_position != 0) {
+					cursor_position--;
 				}
 			}
 		} else if (keys_pressed & KEY_START) {

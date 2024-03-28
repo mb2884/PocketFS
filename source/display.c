@@ -5,24 +5,24 @@
 
 void printAllFiles(Directory *directory) {
 	if (!directory) {
-		printf("Invalid directory\n");
+		// printf("Invalid directory\n");
 		return;
 	}
 
 	printf("Files in directory '%s':\n", directory->name);
-	for (int i = 0; i < directory->num_files; ++i) {
+	for (int i = 0; i < directory->file_count; ++i) {
 		printf("- %s\n", directory->files[i]->name);
 	}
 }
 
 void printAllSubdirectories(Directory *directory) {
 	if (!directory) {
-		printf("Invalid directory\n");
+		// printf("Invalid directory\n");
 		return;
 	}
 
 	printf("Subdirectories in directory '%s':\n", directory->name);
-	for (int i = 0; i < directory->num_subdirectories; ++i) {
+	for (int i = 0; i < directory->subdirectory_count; ++i) {
 		printf("- %s\n", directory->subdirectories[i]->name);
 	}
 }
