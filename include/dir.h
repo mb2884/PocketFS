@@ -23,5 +23,6 @@ File **getAllFilesFromDirectory(Directory *directory);
 Directory **getAllSubdirectoriesFromDirectory(Directory *directory);
 void moveDirectory(Directory *directory, Directory *newParentDirectory);
 void saveDirectory(Directory *directory);
+Directory* loadDirectory();
 
 #endif /* DIR_H */

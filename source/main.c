@@ -15,6 +15,15 @@
 #define MAX_ITEMS 16
 #define MAX_CHARS 599
 
+// Function to change memory mode
+inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
+	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
+	*unlockAddress = 0xA55A;
+	*unlockAddress = 0xA55A;
+	*unlockAddress = mode;
+	*unlockAddress = mode;
+}
+
 void setup() {
 	// Enable VBlank interrupt for VBlankIntrWait() to work
 	irqInit();
@@ -185,8 +194,22 @@ void editFile(File *file) {
 int main(void) {
 	setup();
 
-	// Create root directory
-	Directory *rootDir = createDirectory("root", NULL);
+	Directory *rootDir;
+	unsigned char firstByte;
+
+	// Read the first byte from memory
+	memcpy(&firstByte, (void *)0x0E000000, sizeof(unsigned char));
+
+	// If the first byte is not FF, load the directory, otherwise create a new one
+	if (firstByte != 0xFF) {
+		rootDir = loadDirectory();
+		if (!rootDir) {
+			fprintf(stderr, "Failed to load directory\n");
+			rootDir = createDirectory("root", NULL);
+		}
+	} else {
+		rootDir = createDirectory("root", NULL);
+	}
 
 	// importFiles(rootDir);
 
@@ -209,9 +232,9 @@ int main(void) {
 
 		// Handle directional input
 		if (keys_pressed & KEY_UP) {
-			cursorPosition = (cursorPosition - 1 + (currentDirectory->num_subdirectories + currentDirectory->num_files)) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
+			cursorPosition = (cursorPosition - 1 + totalEntries) % totalEntries;
 		} else if (keys_pressed & KEY_DOWN) {
-			cursorPosition = (cursorPosition + 1) % (currentDirectory->num_subdirectories + currentDirectory->num_files);
+			cursorPosition = (cursorPosition + 1) % totalEntries;
 		} else if (keys_pressed & KEY_LEFT) {
 			if (currentDirectory->parentDirectory != NULL) {
 				currentDirectory = currentDirectory->parentDirectory;
