@@ -7,62 +7,34 @@
     <img src="https://img.shields.io/badge/Contributors-1-blueviolet" />
 </p>
 
->PocketFS is a light file system written in C for the Nintendo Game Boy Advance.
+> PocketFS is a light file system written in C for the Nintendo Game Boy Advance.
 
 The file system will allow users to store and manage files on their GBA devices, providing a convenient way to organize and access data. The file system will be optimized for the limited resources of the GBA, taking into account the device's memory and processing constraints. It will provide efficient file storage and retrieval, ensuring that games and applications can access data quickly and reliably.
 
 ## Features
 - Creation of nested directories and sub-directories
-- Arbitrary files storing key meta-data
 - Basic text editor
+- Saving functionality
 
 ## Installation
 Follow the devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started) for the latest instructions on how to set up the necessary tool chain for your OS. 
 
 Using devkitPro Pacman install the **gba-dev** group package.
 
-```bash
-# Linux
-sudo dkp-pacman -Sy
-sudo dkp-pacman -Syu
-sudo dkp-pacman -S gba-dev
-```
 
-Once installed, you first need to set some variables in your environment before running make to compile into a .gba file.
-
-In a bash shell:
-```bash
-# Linux
-export DEVKITARM="path to devkitARM"
-export DEVKITPRO="path to devkitPro"
-
-make
-```
-
-## Usage
-You can either run the .gba file in an emulator or transfer to an actual GBA via a flashing kit such as the [Ever Drive](https://krikzz.com/our-products/cartridges/everdrive-gba-mini.html).
-
-If using the [mgba emulator](https://mgba.io/downloads.html), you can then launch the program as follows:
-
-```bash
-mgba -4 pocketfs.gba
-```
-### Controls
----
-
-<img src="https://i.imgur.com/aMDGG1k.png" width="50%" align="right">
-
-#### Within the file tree
-
-| Button  | Function                      |
-|---------|-------------------------------|
-| Up      | Shift cursor up one           |
-| Down    | Shift cursor down one         |
-| Left    | Back out of directory         |
-| Right   | Enter a directory/edit a file |
-| B       | Create a directory here       |
-| A       | Create a file here            |
+| Button  | Function                          |
+|---------|-----------------------------------|
+| Up      | Shift cursor up one               |
+| Down    | Shift cursor down one             |
+| Left    | Back out of directory             |
+| Right   | Enter a directory/edit a file     |
+| B       | Create a directory here           |
+| A       | Create a file here                |
 | Select  | Delete highlighted directory/file |
+| Start   | Save all                          |
+| L       | Rename directory/file             |
+
+
 
 #### Within the text editor
 

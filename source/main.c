@@ -13,7 +13,9 @@
 #include <string.h>
 
 #define MAX_ITEMS 16
+#define MAX_NAME_LENGTH 20
 #define MAX_CHARS 599
+#define USE_SAVE 0
 
 // Values for changing mode
 #define SC_MODE_RAM 0x5
@@ -29,6 +31,16 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	*unlockAddress = mode;
 }
 
+void delay(uint32_t milliseconds) {
+	// Calculate the number of CPU cycles required for the given delay
+	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
+
+	// Run a busy loop for the calculated number of cycles
+	for (volatile uint32_t i = 0; i < cycles; ++i) {
+		// This loop consumes CPU cycles, introducing a delay
+	}
+}
+// Perform necessary setup
 void setup() {
 	// Enable VBlank interrupt for VBlankIntrWait() to work
 	irqInit();
@@ -41,7 +53,6 @@ void setup() {
 	REG_DISPCNT = MODE_0 | BG0_ON;
 	BG_PALETTE[0] = RGB5(4, 4, 5);
 }
-
 // Function to print all subdirectories and files and allow selection
 void printCursor(Directory *directory, int cursor_position, int *selectedIsFile) {
 	if (!directory) {
@@ -115,13 +126,13 @@ void editFile(File *file) {
 
 	while (1) {
 		clearScr();
-		if (file->data != NULL) {
+		if (file != NULL) {
 			printf("%.*s", cursor_position, file->data); // Print characters up to cursor position
 		}
 
 		printf("%c", validLetters[selectedLetter]); // Print the selected letter
 
-		if (file->data != NULL) {
+		if (file != NULL) {
 			printf("%s", file->data + cursor_position); // Print remaining part of the file
 		}
 
@@ -173,7 +184,7 @@ void editFile(File *file) {
 					cursor_position++;
 				}
 			}
-		} else if (keys_pressed & KEY_LEFT && file->data != NULL) {
+		} else if (keys_pressed & KEY_LEFT) {
 			if (cursor_position > 0) {
 				cursor_position--; // Move cursor left by one character
 			}
@@ -193,12 +204,70 @@ void editFile(File *file) {
 	}
 }
 
+void renameEntity(void *entity, int isFile) {
+	char *entityName = isFile ? ((File *)entity)->name : ((Directory *)entity)->name;
+	
+	char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>?/`";
+	int selectedLetter = 0;
+
+	char new_name[MAX_NAME_LENGTH];
+	int cursor_position = 0;
+
+	while (1) {
+		clearScr();
+		printf("Renaming \"%s\":\n", entityName);
+		printf("\x1b[2;0H");
+		printf("%.*s", cursor_position, new_name); // Print characters up to cursor position
+		printf("\x1b[2;%dH", cursor_position);
+		printf("%c", validLetters[selectedLetter]); // Print the selected letter
+
+		scanKeys();
+
+		int keys_pressed = keysDown();
+		int keys_held = keysHeld();
+
+		if (keys_pressed & KEY_R) {
+			if (keys_held & KEY_SELECT) {
+				selectedLetter = (selectedLetter + 26) % strlen(validLetters);
+			} else {
+				selectedLetter = (selectedLetter + 1) % strlen(validLetters);
+			}
+		} else if (keys_pressed & KEY_L) {
+			if (keys_held & KEY_SELECT) {
+				selectedLetter = (selectedLetter - 26) % strlen(validLetters);
+			} else {
+				selectedLetter = (selectedLetter - 1 + strlen(validLetters)) % strlen(validLetters);
+			}
+		} else if (keys_pressed & KEY_A && cursor_position < MAX_NAME_LENGTH - 1) {
+			new_name[cursor_position] = validLetters[selectedLetter];
+			cursor_position++;
+			new_name[cursor_position] = '\0'; // Null-terminate the string
+		} else if (keys_pressed & KEY_B && cursor_position > 0) {
+			cursor_position--;
+			new_name[cursor_position] = '\0'; // Null-terminate the string
+		} else if (keys_pressed & KEY_START) { // Save and exit
+			if (isFile) {
+				File *file = (File *)entity;
+				strncpy(file->name, new_name, MAX_NAME_LENGTH);
+				file->name[MAX_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
+			} else {
+				Directory *dir = (Directory *)entity;
+				strncpy(dir->name, new_name, MAX_NAME_LENGTH);
+				dir->name[MAX_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
+			}
+			break;
+		}
+
+		VBlankIntrWait();
+	}
+}
+
 int main(void) {
 	setup();
-
+	// Load previous SAV if it exists
 	Directory *rootDir;
 	char *address_check = (char *)0x0E000000;
-	if (address_check[0] == 'D') {
+	if (address_check[0] == 'D' && USE_SAVE) {
 		rootDir = loadDirectory();
 	} else {
 		rootDir = createDirectory("root", NULL);
@@ -255,7 +324,15 @@ int main(void) {
 			}
 		} else if (keys_pressed & KEY_START) {
 			printf("Saving directory to SRAM...\n");
+			delay(1000);
 			saveDirectory(rootDir);
+
+		} else if (keys_pressed & KEY_L) {
+			if (selectedIsFile) {
+				renameEntity(currentDirectory->files[cursor_position - currentDirectory->subdirectory_count], 1);
+			} else {
+				renameEntity(currentDirectory->subdirectories[cursor_position], 0);
+			}
 		}
 
 		VBlankIntrWait();
