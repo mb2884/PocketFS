@@ -1,5 +1,5 @@
 #include "dir.h"
-#include "display.h"
+#include "utils.h"
 #include "file.h"
 #include "imported_data.h"
 #include <gba_console.h>
@@ -16,8 +16,8 @@
 #define MAX_NAME_LENGTH 27
 #define MAX_CHARS 599
 
-#define USE_SAVE 1
-#define USE_IMPORT 0
+#define USE_SAVE 0
+#define USE_IMPORT 1
 
 // Values for changing mode
 #define SC_MODE_RAM 0x5
@@ -235,6 +235,10 @@ int main(void) {
 	char *address_check = (char *)0x0E000000;
 	if (address_check[0] == 'D' && USE_SAVE) {
 		rootDir = loadDirectory();
+	} else if (USE_IMPORT) {
+		printf("%s\n", text_data);
+		delay(5000);
+		rootDir = deserialize(text_data);
 	} else {
 		rootDir = createDirectory("root", NULL);
 	}
