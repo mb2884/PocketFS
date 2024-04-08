@@ -25,5 +25,7 @@ Directory **getAllSubdirectoriesFromDirectory(Directory *directory);
 void moveDirectory(Directory *directory, Directory *newParentDirectory);
 void saveDirectory(Directory *directory);
 Directory* loadDirectory();
+void serialize(Directory *directory, char **address);
+Directory *deserialize(const char *serialized_str);
 
-#endif /* DIR_H */
+#endif

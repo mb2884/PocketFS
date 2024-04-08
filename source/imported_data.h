@@ -1,6 +1,5 @@
 #ifndef IMPORTED_DATA_H
 #define IMPORTED_DATA_H
-const char* text_data =
-"D test\n\tF New Text Document (2).txt\n\tF New Text Document.txt\n\tD ok\n\t\tF yep.txt";
 
+const char* imported_text_data = "D test {D ok {F yep.txt {I wrote stuff on windows!}}F text_doc_1.txt {i wrote this on windows!}F text_doc_2.txt {}}";
 #endif
