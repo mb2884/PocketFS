@@ -1,6 +1,6 @@
 #include "dir.h"
-#include "file.h"
 #include "display.h"
+#include "file.h"
 #include <gba.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -25,7 +25,7 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 
 void delay(uint32_t milliseconds) {
 	// Calculate the number of CPU cycles required for the given delay
-	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
+	volatile uint32_t cycles = milliseconds * 1; // 1ms delay is approximately 350 CPU cycles
 
 	// Run a busy loop for the calculated number of cycles
 	for (volatile uint32_t i = 0; i < cycles; ++i) {
@@ -166,7 +166,7 @@ void serialize(Directory *directory) {
 
 Directory *deserialize(const char *serialized_str) {
 	Directory *root_dir = NULL;
-	Directory *current_dir = NULL;
+	// Directory *current_dir = NULL;
 	Directory *parent_dir = NULL;
 	File *current_file = NULL;
 	char newDirName[MAX_SIZE];
@@ -176,79 +176,93 @@ Directory *deserialize(const char *serialized_str) {
 	bool isInFile = false;
 
 	printf("Deserializing...\n");
-
+	// Scanning
 	for (int i = 0; serialized_str[i] != '\0'; i++) {
 		printf("loop char is: %c\n", serialized_str[i]);
 		delay(3000);
-		if (serialized_str[i] == 'D' && !isInFile) {
-			// Skip one more character to ignore the space after 'D'
-			i = i + 2;
-
-			// Read directory name
+		// Hit directory
+		if (serialized_str[i] == 'D') {
+			i++;
+			printf("Hit directory, %c\n", serialized_str[i]);
+			delay(2000);
+			// Found directory name
+			if (serialized_str[i] == ' ') {
+				i++;
+			}
+			printf("Upping i, %c\n", serialized_str[i]);
+			// Scanned in directory name
 			int j = 0;
-			while (serialized_str[i] != ' ' && serialized_str[i] != '{') {
-				printf("char for dir is: %c\n", serialized_str[i]);
-				delay(500);
-				newDirName[j++] = serialized_str[i++];
+			while (serialized_str[i] != ' ') {
+				if (serialized_str[i] == '{') {
+					break;
+				}
+				newDirName[j] = serialized_str[i];
+				printf("dir name, %c\n", serialized_str[i]);
+				i++;
+				j++;
 			}
 			newDirName[j] = '\0';
-
-
-
-			// Create directory
-			if (root_dir == NULL) {
-							printf("Creating directory: %s\n", newDirName);
-			// Add delay for debugging
+			printf("New directory name: %s\n", newDirName);
 			delay(2000);
+			// Save directory
+			if (root_dir == NULL) {
 				root_dir = createDirectory(newDirName, NULL);
-				current_dir = root_dir;
+				parent_dir = root_dir;
 			} else {
-				printf("Creating subdirectory: %s with parent %s\n", newDirName, current_dir->name);
-				current_dir = createDirectory(newDirName, current_dir);
+				parent_dir = createDirectory(newDirName, parent_dir);
 			}
-			parent_dir = current_dir->parent_directory;
-			while (serialized_str[i] != '}' && serialized_str[i] != '\0' && !isInFile) {
+			printf("Created directory %s with parent %s\n", parent_dir->name, parent_dir->parent_directory->name);
+			delay(2000);
+			// Return to scanning
+			while (serialized_str[i] != '{') {
 				i++;
-				if (serialized_str[i-1] == 'F' && !isInFile) {
-					// Skip one more character to ignore the space after 'F'
-					i = i + 1;
-
-					// Read file name
-					int k = 0;
-					while (serialized_str[i] != ' ' && serialized_str[i] != '{') {
-						newFileName[k++] = serialized_str[i++];
-					}
-					newFileName[k] = '\0';
-					printf("Creating file: %s\n", newFileName);
-					delay(2000);
-
-					// Skip one more character to ignore the space after '{'
-					i = i + 2;
-
-					// Read file contents
-					int l = 0;
-					while (serialized_str[i] != '}') {
-						newFileContents[l++] = serialized_str[i++];
-					}
-					i++;
-
-					newFileContents[l] = '\0';
-
-					printf("Writing to file: %s\n", newFileContents);
-					// Add delay for debugging
-					delay(2000);
-
-					// Create file
-					current_file = createFile(newFileName, current_dir);
-					writeFile(current_file, newFileContents);
-
-					printf("serialized string at %c\n", serialized_str[i]);
-					delay(2000);
-				}
+				printf("while loop, %c\n", serialized_str[i]);
+				delay(2000);
 			}
-			// i--;
-			printf("Exiting while with char %c\n", serialized_str[i]);
-			delay(1000);
+
+		} else if (serialized_str[i] == 'F') {
+			i++;
+			printf("Hit file, %c\n", serialized_str[i]);
+			// Found file name
+			if (serialized_str[i] == ' ') {
+				i++;
+			}
+			printf("file now %c\n", serialized_str[i]);
+			// Scanned in file name
+			int j = 0;
+			while (serialized_str[i] != ' ') {
+				newFileName[j] = serialized_str[i];
+				printf("file name, %c\n", serialized_str[i]);
+				i++;
+				j++;
+			}
+			newFileName[j] = '\0';
+			// Save file
+			current_file = createFile(newFileName, parent_dir);
+			printf("Created file %s with parent %s\n", current_file->name, current_file->parent_directory->name);
+			// Return to scanning
+			while (serialized_str[i] != '{') {
+				i++;
+			}
+			printf("Hit a {, %c\n", serialized_str[i]);
+			// Scanning in file contents
+			i++;
+			while (serialized_str[i] != '}') {
+				newFileContents[newFileContentsIndex] = serialized_str[i];
+				newFileContentsIndex++;
+				i++;
+			}
+			newFileContents[newFileContentsIndex] = '\0';
+			printf("New file contents: %s\n", newFileContents);
+			delay(2000);
+			// Save file contents
+			writeFile(current_file, newFileContents);
+			newFileContentsIndex = 0;
+
+		} else if (serialized_str[i] == '}') {
+			printf("Setting parent to %s\n", parent_dir->parent_directory->name);
+			delay(2000);
+			parent_dir = parent_dir->parent_directory;
 		}
 	}
 	printf("Deserialization complete\n");
@@ -285,11 +299,11 @@ void saveDirectory(Directory *directory) {
 // 		i++;
 // 		length++;
 // 	}
-	
+
 // 	char* buffer = malloc(length + 1);
 // 	strncpy(buffer, str, length);
 // 	buffer[length] = '\0';
-	
+
 // 	return buffer;
 // }
 
