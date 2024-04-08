@@ -33,15 +33,6 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	*unlockAddress = mode;
 }
 
-void delay(uint32_t milliseconds) {
-	// Calculate the number of CPU cycles required for the given delay
-	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
-
-	// Run a busy loop for the calculated number of cycles
-	for (volatile uint32_t i = 0; i < cycles; ++i) {
-		// This loop consumes CPU cycles, introducing a delay
-	}
-}
 // Perform necessary setup
 void setup() {
 	// Enable VBlank interrupt for VBlankIntrWait() to work

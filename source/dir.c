@@ -1,5 +1,6 @@
 #include "dir.h"
 #include "file.h"
+#include "display.h"
 #include <gba.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,6 +21,16 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	*unlockAddress = 0xA55A;
 	*unlockAddress = mode;
 	*unlockAddress = mode;
+}
+
+void delay(uint32_t milliseconds) {
+	// Calculate the number of CPU cycles required for the given delay
+	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
+
+	// Run a busy loop for the calculated number of cycles
+	for (volatile uint32_t i = 0; i < cycles; ++i) {
+		// This loop consumes CPU cycles, introducing a delay
+	}
 }
 
 // Function to create a directory
@@ -120,42 +131,29 @@ void moveDirectory(Directory *directory, Directory *newParentDirectory) {
 }
 
 // Function to serialize the directory structure
-void serializeHelper(Directory *directory, int indent, char **address) {
+void serializeHelper(Directory *directory, char **address) {
 	if (directory == NULL)
 		return;
 
 	char buffer[MAX_SIZE];
 
-	sprintf(buffer, "%*sD %s\n", indent, "", directory->name);
+	sprintf(buffer, "D %s {", directory->name);
 	strcpy(*address, buffer);
 	*address += strlen(buffer);
 
 	for (int i = 0; i < directory->file_count; i++) {
 		File *file = directory->files[i];
-		sprintf(buffer, "%*sF %s\n", indent + 4, "", file->name);
-		strcpy(*address, buffer);
-		*address += strlen(buffer);
-
-		sprintf(buffer, "%*s%d\n", indent + 8, "", file->size);
-		strcpy(*address, buffer);
-		*address += strlen(buffer);
-
-		sprintf(buffer, "%*s%d\n", indent + 8, "", file->capacity);
-		strcpy(*address, buffer);
-		*address += strlen(buffer);
-
-		sprintf(buffer, "%*s%d\n", indent + 8, "", file->cursor_position);
-		strcpy(*address, buffer);
-		*address += strlen(buffer);
-
-		sprintf(buffer, "%*s%s\n", indent + 8, "", file->data);
+		sprintf(buffer, "F %s {%s}", file->name, file->data);
 		strcpy(*address, buffer);
 		*address += strlen(buffer);
 	}
 
 	for (int i = 0; i < directory->subdirectory_count; i++) {
-		serializeHelper(directory->subdirectories[i], indent + 4, address);
+		serializeHelper(directory->subdirectories[i], address);
 	}
+
+	strcpy(*address, "}");
+	*address += 1;
 }
 
 void serialize(Directory *directory) {
@@ -163,83 +161,105 @@ void serialize(Directory *directory) {
 		return;
 
 	char *address = (char *)0x0E000000; // Start address
-	serializeHelper(directory, 0, &address);
+	serializeHelper(directory, &address);
 }
 
 Directory *deserialize(const char *serialized_str) {
-	char buffer[MAX_SIZE];
-	char name[MAX_SIZE];
-	char type[MAX_SIZE];
-	int size, capacity, cursor_position;
-	char data[MAX_SIZE];
+	Directory *root_dir = NULL;
+	Directory *current_dir = NULL;
+	Directory *parent_dir = NULL;
+	File *current_file = NULL;
+	char newDirName[MAX_SIZE];
+	char newFileName[MAX_SIZE];
+	char newFileContents[MAX_SIZE];
+	int newFileContentsIndex = 0;
+	bool isInFile = false;
 
 	printf("Deserializing...\n");
 
-	FILE *stream = fmemopen((void *)serialized_str, strlen(serialized_str), "r");
-	Directory *root_dir = NULL;
-	Directory *current_dir = NULL;
-	Directory *last_parent = NULL;
-	int last_indent = -1;	   // Keep track of the last indentation level
-	bool add_directory = true; // Boolean variable to determine whether to add a directory
+	for (int i = 0; serialized_str[i] != '\0'; i++) {
+		printf("loop char is: %c\n", serialized_str[i]);
+		delay(3000);
+		if (serialized_str[i] == 'D' && !isInFile) {
+			// Skip one more character to ignore the space after 'D'
+			i = i + 2;
 
-	while (fgets(buffer, sizeof(buffer), stream) != NULL) {
-		int indent = 0;
-		while (buffer[indent] == ' ')
-			indent++;
+			// Read directory name
+			int j = 0;
+			while (serialized_str[i] != ' ' && serialized_str[i] != '{') {
+				printf("char for dir is: %c\n", serialized_str[i]);
+				delay(500);
+				newDirName[j++] = serialized_str[i++];
+			}
+			newDirName[j] = '\0';
 
-		sscanf(buffer + indent, "%s %s", type, name);
 
-		if (strcmp(type, "D") == 0) {
-			if (add_directory) {
-				if (indent > last_indent) {
-					last_parent = current_dir;
-				} else if (indent < last_indent) {
-					for (int i = 0; i < last_indent - indent; i++) {
-						if (last_parent != NULL) {
-							last_parent = last_parent->parent_directory;
-						}
+
+			// Create directory
+			if (root_dir == NULL) {
+							printf("Creating directory: %s\n", newDirName);
+			// Add delay for debugging
+			delay(2000);
+				root_dir = createDirectory(newDirName, NULL);
+				current_dir = root_dir;
+			} else {
+				printf("Creating subdirectory: %s with parent %s\n", newDirName, current_dir->name);
+				current_dir = createDirectory(newDirName, current_dir);
+			}
+			parent_dir = current_dir->parent_directory;
+			while (serialized_str[i] != '}' && serialized_str[i] != '\0' && !isInFile) {
+				i++;
+				if (serialized_str[i-1] == 'F' && !isInFile) {
+					// Skip one more character to ignore the space after 'F'
+					i = i + 1;
+
+					// Read file name
+					int k = 0;
+					while (serialized_str[i] != ' ' && serialized_str[i] != '{') {
+						newFileName[k++] = serialized_str[i++];
 					}
+					newFileName[k] = '\0';
+					printf("Creating file: %s\n", newFileName);
+					delay(2000);
+
+					// Skip one more character to ignore the space after '{'
+					i = i + 2;
+
+					// Read file contents
+					int l = 0;
+					while (serialized_str[i] != '}') {
+						newFileContents[l++] = serialized_str[i++];
+					}
+					i++;
+
+					newFileContents[l] = '\0';
+
+					printf("Writing to file: %s\n", newFileContents);
+					// Add delay for debugging
+					delay(2000);
+
+					// Create file
+					current_file = createFile(newFileName, current_dir);
+					writeFile(current_file, newFileContents);
+
+					printf("serialized string at %c\n", serialized_str[i]);
+					delay(2000);
 				}
-
-				Directory *new_dir = createDirectory(name, last_parent);
-
-				if (last_parent != NULL) {
-					last_parent->subdirectories[last_parent->subdirectory_count++] = new_dir;
-				} else {
-					root_dir = new_dir;
-				}
-
-				current_dir = new_dir;
-				last_indent = indent;
 			}
-			add_directory = !add_directory; // Flip-flop the boolean variable
-		} else if (strcmp(type, "F") == 0) {
-			File *new_file = createFile(name, current_dir);
-			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &size) != 1) {
-				printf("Error parsing file size.\n");
-				continue;
-			}
-			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &capacity) != 1) {
-				printf("Error parsing file capacity.\n");
-				continue;
-			}
-			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &cursor_position) != 1) {
-				printf("Error parsing file cursor position.\n");
-				continue;
-			}
-			if (fgets(data, sizeof(data), stream) == NULL) {
-				printf("Error reading file data.\n");
-				continue;
-			}
-			data[strlen(data) - 1] = '\0'; // Removing newline
-			strcpy(new_file->data, data);
-			new_file->size = size;
-			new_file->capacity = capacity;
-			new_file->cursor_position = cursor_position;
+			// i--;
+			printf("Exiting while with char %c\n", serialized_str[i]);
+			delay(1000);
 		}
 	}
+	printf("Deserialization complete\n");
+	// Add delay for debugging
+	delay(2000);
 
-	fclose(stream);
+	printBreak();
+	printAllFiles(root_dir);
+	delay(2000);
+	printAllSubdirectories(root_dir);
+	delay(2000);
 	return root_dir;
 }
 
@@ -252,20 +272,41 @@ void saveDirectory(Directory *directory) {
 	_SC_changeMode(SC_MODE_RAM);
 	memset((void *)address, 0xFFFF, 0x0E00FFFF - 0x0E000000 + 1);
 	address += 0x0E00FFFF - 0x0E000000 + 1;
-	serializeHelper(directory, 0, &address);
+	serializeHelper(directory, &address);
 	_SC_changeMode(SC_MODE_MEDIA);
 }
 
+// char* printString(const char *str) {
+// 	int i = 0;
+// 	int length = 0;
+// 	while (str[i] != '\0') {
+// 		putchar(str[i]);
+// 		delay(1000);
+// 		i++;
+// 		length++;
+// 	}
+	
+// 	char* buffer = malloc(length + 1);
+// 	strncpy(buffer, str, length);
+// 	buffer[length] = '\0';
+	
+// 	return buffer;
+// }
+
 // Function to load the serialized directory structure from address 0x0E000000
 Directory *loadDirectory() {
+	printf("Loading directory from SRAM...\n");
+	delay(2000);
 	char *serialized_data = (char *)0x0E000000; // Start address
 
 	// Create a temporary buffer to hold the serialized data
-	char buffer[MAX_SIZE];
-	strcpy(buffer, serialized_data);
+	// char buffer[MAX_SIZE];
+	// strcpy(buffer, serialized_data);
 
 	// Deserialize the data from the buffer
-	Directory *deserialized_dir = deserialize(buffer);
+	Directory *deserialized_dir = deserialize(serialized_data);
+	// printString(serialized_data);
+	delay(20000);
 
 	return deserialized_dir;
 }
