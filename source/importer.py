@@ -9,7 +9,11 @@ def serialize_directory(directory_path):
             serialized_str += serialize_directory(item_path)
         elif os.path.isfile(item_path):
             with open(item_path, 'r') as file:
-                file_content = file.read()
+                file_content = file.read().replace('"', r'\"')  # Escape double quotes
+                file_content = file_content.replace('\n', r'\n')  # Replace newline with \\n
+                file_content = file_content.replace('\t', r'\t')  # Replace newline with \\n
+                file_content = file_content.replace('{', r'f')  # Replace newline with \\n
+                file_content = file_content.replace('}', r'b')  # Replace newline with \\n
             serialized_str += 'F ' + item + ' {' + file_content + '}'
     serialized_str += '}'
     return serialized_str
