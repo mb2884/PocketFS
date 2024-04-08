@@ -1,6 +1,0 @@
-#ifndef TEXT_DATA_H
-#define TEXT_DATA_H
-
-const char text_data[] = "<p>Lorem ipsum dolor sit amet. In error numquam et expedita officia et quasi provident aut placeat totam? Ut sint doloremque qui dignissimos enim est voluptate consequatur est dolorem minima est impedit consectetur et doloremque quaerat. Et eius saepe aut dolor tempore aut animi officia est voluptatibus ipsa. </p><p>Vel numquam facilis ex aspernatur maxime quo galisum velit ad incidunt dolor eum reprehenderit tempore. Eos galisum enim rem deleniti quas ea cupiditate alias et rerum ducimus aut quaerat recusandae id praesentium voluptatem. Hic voluptatem fugit et sapiente consequatur et dicta rerum et omnis sunt. </p><p>Sit temporibus atque et quidem dolor ex numquam obcaecati id dolorum saepe aut numquam numquam aut dolore illo. Aut earum Quis sed deleniti assumenda a consectetur quisquam ea odit voluptatibus. Et magnam libero eum eveniet suscipit et maxime consequatur At quasi facere cum officia omnis. Qui unde nihil et neque fuga et impedit eius ea possimus quae. </p><p>Ut molestiae minus et odit nobis et minima rerum sit voluptates velit et itaque molestiae. Ea veritatis officia eum accusamus adipisci ut error quidem quo similique facere aut corporis iure qui nisi dolorem et debitis quos. </p>\n";
-
-#endif // TEXT_DATA_H

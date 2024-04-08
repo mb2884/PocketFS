@@ -1,7 +1,7 @@
 #include "dir.h"
 #include "display.h"
 #include "file.h"
-#include "text_data.h"
+#include "imported_data.h"
 #include <gba_console.h>
 #include <gba_input.h>
 #include <gba_interrupt.h>
@@ -13,9 +13,11 @@
 #include <string.h>
 
 #define MAX_ITEMS 16
-#define MAX_NAME_LENGTH 20
+#define MAX_NAME_LENGTH 27
 #define MAX_CHARS 599
-#define USE_SAVE 0
+
+#define USE_SAVE 1
+#define USE_IMPORT 0
 
 // Values for changing mode
 #define SC_MODE_RAM 0x5
@@ -86,33 +88,6 @@ void printCursor(Directory *directory, int cursor_position, int *selectedIsFile)
 			printf("   ");
 		}
 		printf("%s\n", directory->files[i]->name);
-	}
-}
-
-void importFiles(Directory *rootDir) {
-	if (text_data[0] != '\0') {
-		if (strlen(text_data) > MAX_CHARS) {
-			int numFiles = strlen(text_data) / MAX_CHARS;
-			int remainingChars = strlen(text_data) % MAX_CHARS;
-			for (int i = 0; i < numFiles; i++) {
-				if (rootDir->file_count + rootDir->subdirectory_count >= MAX_ITEMS) {
-					break;
-				}
-				char *fileData = (char *)malloc(MAX_CHARS + 1);
-				strlcpy(fileData, text_data + i * MAX_CHARS, MAX_CHARS + 1);
-				File *file = createFile("user.txt", rootDir);
-				writeFile(file, fileData);
-			}
-			if (remainingChars > 0) {
-				char *fileData = (char *)malloc(remainingChars + 1);
-				strlcpy(fileData, text_data + numFiles * MAX_CHARS, remainingChars + 1);
-				File *file = createFile("user.txt", rootDir);
-				writeFile(file, fileData);
-			}
-		} else {
-			File *file = createFile("user.txt", rootDir);
-			writeFile(file, text_data);
-		}
 	}
 }
 
@@ -327,7 +302,7 @@ int main(void) {
 			delay(1000);
 			saveDirectory(rootDir);
 
-		} else if (keys_pressed & KEY_L) {
+		} else if (keys_pressed & KEY_L && totalEntries > 0) {
 			if (selectedIsFile) {
 				renameEntity(currentDirectory->files[cursor_position - currentDirectory->subdirectory_count], 1);
 			} else {
