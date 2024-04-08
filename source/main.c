@@ -1,5 +1,5 @@
 #include "dir.h"
-#include "display.h"
+#include "utils.h"
 #include "file.h"
 #include "imported_data.h"
 #include <gba_console.h>
