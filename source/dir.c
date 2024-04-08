@@ -166,10 +166,7 @@ Directory *deserialize(const char *serialized_str) {
 
 			// Scanned in directory name
 			int j = 0;
-			while (serialized_str[i] != ' ') {
-				if (serialized_str[i] == '{') {
-					break;
-				}
+			while (serialized_str[i] != '{') {
 				newDirName[j] = serialized_str[i];
 				i++;
 				j++;
@@ -184,11 +181,6 @@ Directory *deserialize(const char *serialized_str) {
 				parent_dir = createDirectory(newDirName, parent_dir);
 			}
 
-			// Return to scanning
-			while (serialized_str[i] != '{') {
-				i++;
-			}
-
 		} else if (serialized_str[i] == 'F') {
 			i++;
 
@@ -199,7 +191,7 @@ Directory *deserialize(const char *serialized_str) {
 
 			// Scanned in file name
 			int j = 0;
-			while (serialized_str[i] != ' ') {
+			while (serialized_str[i] != '{') {
 				newFileName[j] = serialized_str[i];
 				i++;
 				j++;
@@ -208,10 +200,6 @@ Directory *deserialize(const char *serialized_str) {
 			// Save file
 			current_file = createFile(newFileName, parent_dir);
 
-			// Return to scanning
-			while (serialized_str[i] != '{') {
-				i++;
-			}
 			// Scanning in file contents
 			i++;
 			while (serialized_str[i] != '}') {
