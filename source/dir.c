@@ -22,14 +22,11 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	*unlockAddress = mode;
 	*unlockAddress = mode;
 }
-
+// Busy loop
 void delay(uint32_t milliseconds) {
-	// Calculate the number of CPU cycles required for the given delay
-	volatile uint32_t cycles = milliseconds * 1; // 1ms delay is approximately 350 CPU cycles
+	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
 
-	// Run a busy loop for the calculated number of cycles
 	for (volatile uint32_t i = 0; i < cycles; ++i) {
-		// This loop consumes CPU cycles, introducing a delay
 	}
 }
 
@@ -130,8 +127,7 @@ void moveDirectory(Directory *directory, Directory *newParentDirectory) {
 	newParentDirectory->subdirectories[newParentDirectory->subdirectory_count++] = directory;
 }
 
-// Function to serialize the directory structure
-void serializeHelper(Directory *directory, char **address) {
+void serialize(Directory *directory, char **address) {
 	if (directory == NULL)
 		return;
 
@@ -149,47 +145,32 @@ void serializeHelper(Directory *directory, char **address) {
 	}
 
 	for (int i = 0; i < directory->subdirectory_count; i++) {
-		serializeHelper(directory->subdirectories[i], address);
+		serialize(directory->subdirectories[i], address);
 	}
 
 	strcpy(*address, "}");
 	*address += 1;
 }
 
-void serialize(Directory *directory) {
-	if (directory == NULL)
-		return;
-
-	char *address = (char *)0x0E000000; // Start address
-	serializeHelper(directory, &address);
-}
-
 Directory *deserialize(const char *serialized_str) {
 	Directory *root_dir = NULL;
-	// Directory *current_dir = NULL;
 	Directory *parent_dir = NULL;
 	File *current_file = NULL;
 	char newDirName[MAX_SIZE];
 	char newFileName[MAX_SIZE];
 	char newFileContents[MAX_SIZE];
 	int newFileContentsIndex = 0;
-	bool isInFile = false;
 
-	printf("Deserializing...\n");
 	// Scanning
 	for (int i = 0; serialized_str[i] != '\0'; i++) {
-		printf("loop char is: %c\n", serialized_str[i]);
-		delay(3000);
 		// Hit directory
 		if (serialized_str[i] == 'D') {
 			i++;
-			printf("Hit directory, %c\n", serialized_str[i]);
-			delay(2000);
 			// Found directory name
 			if (serialized_str[i] == ' ') {
 				i++;
 			}
-			printf("Upping i, %c\n", serialized_str[i]);
+
 			// Scanned in directory name
 			int j = 0;
 			while (serialized_str[i] != ' ') {
@@ -197,13 +178,11 @@ Directory *deserialize(const char *serialized_str) {
 					break;
 				}
 				newDirName[j] = serialized_str[i];
-				printf("dir name, %c\n", serialized_str[i]);
 				i++;
 				j++;
 			}
 			newDirName[j] = '\0';
-			printf("New directory name: %s\n", newDirName);
-			delay(2000);
+
 			// Save directory
 			if (root_dir == NULL) {
 				root_dir = createDirectory(newDirName, NULL);
@@ -211,40 +190,35 @@ Directory *deserialize(const char *serialized_str) {
 			} else {
 				parent_dir = createDirectory(newDirName, parent_dir);
 			}
-			printf("Created directory %s with parent %s\n", parent_dir->name, parent_dir->parent_directory->name);
-			delay(2000);
+
 			// Return to scanning
 			while (serialized_str[i] != '{') {
 				i++;
-				printf("while loop, %c\n", serialized_str[i]);
-				delay(2000);
 			}
 
 		} else if (serialized_str[i] == 'F') {
 			i++;
-			printf("Hit file, %c\n", serialized_str[i]);
+
 			// Found file name
 			if (serialized_str[i] == ' ') {
 				i++;
 			}
-			printf("file now %c\n", serialized_str[i]);
+
 			// Scanned in file name
 			int j = 0;
 			while (serialized_str[i] != ' ') {
 				newFileName[j] = serialized_str[i];
-				printf("file name, %c\n", serialized_str[i]);
 				i++;
 				j++;
 			}
 			newFileName[j] = '\0';
 			// Save file
 			current_file = createFile(newFileName, parent_dir);
-			printf("Created file %s with parent %s\n", current_file->name, current_file->parent_directory->name);
+
 			// Return to scanning
 			while (serialized_str[i] != '{') {
 				i++;
 			}
-			printf("Hit a {, %c\n", serialized_str[i]);
 			// Scanning in file contents
 			i++;
 			while (serialized_str[i] != '}') {
@@ -253,27 +227,15 @@ Directory *deserialize(const char *serialized_str) {
 				i++;
 			}
 			newFileContents[newFileContentsIndex] = '\0';
-			printf("New file contents: %s\n", newFileContents);
-			delay(2000);
+
 			// Save file contents
 			writeFile(current_file, newFileContents);
 			newFileContentsIndex = 0;
 
 		} else if (serialized_str[i] == '}') {
-			printf("Setting parent to %s\n", parent_dir->parent_directory->name);
-			delay(2000);
 			parent_dir = parent_dir->parent_directory;
 		}
 	}
-	printf("Deserialization complete\n");
-	// Add delay for debugging
-	delay(2000);
-
-	printBreak();
-	printAllFiles(root_dir);
-	delay(2000);
-	printAllSubdirectories(root_dir);
-	delay(2000);
 	return root_dir;
 }
 
@@ -283,29 +245,13 @@ void saveDirectory(Directory *directory) {
 		return;
 
 	char *address = (char *)0x0E000000;
+	// Wipe RAM before writing
 	_SC_changeMode(SC_MODE_RAM);
 	memset((void *)address, 0xFFFF, 0x0E00FFFF - 0x0E000000 + 1);
 	address += 0x0E00FFFF - 0x0E000000 + 1;
-	serializeHelper(directory, &address);
+	serialize(directory, &address);
 	_SC_changeMode(SC_MODE_MEDIA);
 }
-
-// char* printString(const char *str) {
-// 	int i = 0;
-// 	int length = 0;
-// 	while (str[i] != '\0') {
-// 		putchar(str[i]);
-// 		delay(1000);
-// 		i++;
-// 		length++;
-// 	}
-
-// 	char* buffer = malloc(length + 1);
-// 	strncpy(buffer, str, length);
-// 	buffer[length] = '\0';
-
-// 	return buffer;
-// }
 
 // Function to load the serialized directory structure from address 0x0E000000
 Directory *loadDirectory() {
@@ -313,14 +259,8 @@ Directory *loadDirectory() {
 	delay(2000);
 	char *serialized_data = (char *)0x0E000000; // Start address
 
-	// Create a temporary buffer to hold the serialized data
-	// char buffer[MAX_SIZE];
-	// strcpy(buffer, serialized_data);
-
 	// Deserialize the data from the buffer
 	Directory *deserialized_dir = deserialize(serialized_data);
-	// printString(serialized_data);
-	delay(20000);
 
 	return deserialized_dir;
 }
