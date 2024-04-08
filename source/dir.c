@@ -1,9 +1,9 @@
 #include "dir.h"
 #include "file.h"
 #include <gba.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 // Values for changing mode
@@ -167,102 +167,91 @@ void serialize(Directory *directory) {
 }
 
 Directory *deserialize(const char *serialized_str) {
-    char buffer[MAX_SIZE];
-    char name[MAX_SIZE];
-    char type[MAX_SIZE];
-    int size, capacity, cursor_position;
-    char data[MAX_SIZE];
+	char buffer[MAX_SIZE];
+	char name[MAX_SIZE];
+	char type[MAX_SIZE];
+	int size, capacity, cursor_position;
+	char data[MAX_SIZE];
 
-    printf("Deserializing...\n");
+	printf("Deserializing...\n");
 
-    FILE *stream = fmemopen((void *)serialized_str, strlen(serialized_str), "r");
-    Directory *root_dir = NULL;
-    Directory *current_dir = NULL;
-    Directory *last_parent = NULL;
-    int last_indent = -1;  // Keep track of the last indentation level
-    bool add_directory = true; // Boolean variable to determine whether to add a directory
+	FILE *stream = fmemopen((void *)serialized_str, strlen(serialized_str), "r");
+	Directory *root_dir = NULL;
+	Directory *current_dir = NULL;
+	Directory *last_parent = NULL;
+	int last_indent = -1;	   // Keep track of the last indentation level
+	bool add_directory = true; // Boolean variable to determine whether to add a directory
 
-    while (fgets(buffer, sizeof(buffer), stream) != NULL) {
-        int indent = 0;
-        while (buffer[indent] == ' ')
-            indent++;
+	while (fgets(buffer, sizeof(buffer), stream) != NULL) {
+		int indent = 0;
+		while (buffer[indent] == ' ')
+			indent++;
 
-        sscanf(buffer + indent, "%s %s", type, name);
+		sscanf(buffer + indent, "%s %s", type, name);
 
-        if (strcmp(type, "D") == 0) {
-            if (add_directory) {
-                if (indent > last_indent) {
-                    last_parent = current_dir;
-                } else if (indent < last_indent) {
-                    for (int i = 0; i < last_indent - indent; i++) {
-                        if (last_parent != NULL) {
-                            last_parent = last_parent->parent_directory;
-                        }
-                    }
-                }
+		if (strcmp(type, "D") == 0) {
+			if (add_directory) {
+				if (indent > last_indent) {
+					last_parent = current_dir;
+				} else if (indent < last_indent) {
+					for (int i = 0; i < last_indent - indent; i++) {
+						if (last_parent != NULL) {
+							last_parent = last_parent->parent_directory;
+						}
+					}
+				}
 
-                Directory *new_dir = createDirectory(name, last_parent);
+				Directory *new_dir = createDirectory(name, last_parent);
 
-                if (last_parent != NULL) {
-                    last_parent->subdirectories[last_parent->subdirectory_count++] = new_dir;
-                } else {
-                    root_dir = new_dir;
-                }
+				if (last_parent != NULL) {
+					last_parent->subdirectories[last_parent->subdirectory_count++] = new_dir;
+				} else {
+					root_dir = new_dir;
+				}
 
-                current_dir = new_dir;
-                last_indent = indent;
-            }
-            add_directory = !add_directory; // Flip-flop the boolean variable
-        }
-        else if (strcmp(type, "F") == 0) {
-            File* new_file = createFile(name, current_dir);
-            if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &size) != 1) {
-                printf("Error parsing file size.\n");
-                continue;
-            }
-            if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &capacity) != 1) {
-                printf("Error parsing file capacity.\n");
-                continue;
-            }
-            if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &cursor_position) != 1) {
-                printf("Error parsing file cursor position.\n");
-                continue;
-            }
-            if (fgets(data, sizeof(data), stream) == NULL) {
-                printf("Error reading file data.\n");
-                continue;
-            }
-            data[strlen(data) - 1] = '\0'; // Removing newline
-            strcpy(new_file->data, data);
-            new_file->size = size;
-            new_file->capacity = capacity;
-            new_file->cursor_position = cursor_position;
-        }
-    }
+				current_dir = new_dir;
+				last_indent = indent;
+			}
+			add_directory = !add_directory; // Flip-flop the boolean variable
+		} else if (strcmp(type, "F") == 0) {
+			File *new_file = createFile(name, current_dir);
+			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &size) != 1) {
+				printf("Error parsing file size.\n");
+				continue;
+			}
+			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &capacity) != 1) {
+				printf("Error parsing file capacity.\n");
+				continue;
+			}
+			if (fgets(buffer, sizeof(buffer), stream) == NULL || sscanf(buffer, "%d", &cursor_position) != 1) {
+				printf("Error parsing file cursor position.\n");
+				continue;
+			}
+			if (fgets(data, sizeof(data), stream) == NULL) {
+				printf("Error reading file data.\n");
+				continue;
+			}
+			data[strlen(data) - 1] = '\0'; // Removing newline
+			strcpy(new_file->data, data);
+			new_file->size = size;
+			new_file->capacity = capacity;
+			new_file->cursor_position = cursor_position;
+		}
+	}
 
-    fclose(stream);
-    return root_dir;
+	fclose(stream);
+	return root_dir;
 }
-
-
-
-
-
-
-
-             
-
-            
-
-
 
 // Function to save the serialized directory structure at address 0x0E000000
 void saveDirectory(Directory *directory) {
 	if (directory == NULL)
 		return;
 
-	char *address = (char *)0x0E000000; // Start address
+	char *address = (char *)0x0E000000;
 	_SC_changeMode(SC_MODE_RAM);
+	memset((void *)address, 0xFFFF, 0x0E00FFFF - 0x0E000000 + 1);
+	address += 0x0E00FFFF - 0x0E000000 + 1;
 	serializeHelper(directory, 0, &address);
 	_SC_changeMode(SC_MODE_MEDIA);
 }
