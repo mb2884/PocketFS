@@ -1,5 +1,5 @@
 #include "dir.h"
-#include "utils.h"
+#include "display.h"
 #include "file.h"
 #include <gba.h>
 #include <stdbool.h>
@@ -21,6 +21,13 @@ inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 	*unlockAddress = 0xA55A;
 	*unlockAddress = mode;
 	*unlockAddress = mode;
+}
+// Busy loop
+void delay(uint32_t milliseconds) {
+	volatile uint32_t cycles = milliseconds * 350; // 1ms delay is approximately 350 CPU cycles
+
+	for (volatile uint32_t i = 0; i < cycles; ++i) {
+	}
 }
 
 // Function to create a directory
