@@ -42,58 +42,25 @@ mgba -4 pocketfs.gba
 
 ### Controls
 
-<img src="./assets/fs demo.png" width="50%" align="right">
+<h4>Within the file browser</h4>
+    
+| <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Back out of directory</td> </tr> <tr> <td>Right</td> <td>Enter a directory/edit a file</td> </tr> <tr> <td>B</td> <td>Create a directory here</td> </tr> <tr> <td>A</td> <td>Create a file here</td> </tr> <tr> <td>Select</td> <td>Delete highlighted directory/file</td> </tr> <tr> <td>Start</td> <td>Save all</td> </tr> <tr> <td>L</td> <td>Rename directory/file</td> </tr> </tbody></table> | <img src="./assets/fs demo.png" width="100%"> |
+| ------------- | ------------- |
 
-#### Within the file browser
+<h4>Within the text editor</h4>
 
-| Button  | Function                          |
-|---------|-----------------------------------|
-| Up      | Shift cursor up one               |
-| Down    | Shift cursor down one             |
-| Left    | Back out of directory             |
-| Right   | Enter a directory/edit a file     |
-| B       | Create a directory here           |
-| A       | Create a file here                |
-| Select  | Delete highlighted directory/file |
-| Start   | Save all                          |
-| L       | Rename directory/file             |
-
-<img src="./assets/text editor demo.png" width="50%" align="right">
-
-#### Within the text editor
-
-| Button        | Function                                                |
-| ------------- | ------------------------------------------------------- |
-| L             | Cycle selected character left                           |
-| R             | Cycle selected character right                          |
-| Up            | Shift cursor up one                                     |
-| Down          | Shift cursor down one                                   |
-| Left          | Shift cursor left one                                   |
-| Right         | Shift cursor right one                                  |
-| Select        | Shift-like modifier key to skip 26 characters left/right|
-| Start + Select| Save and exit file                                      |
-| A             | Print selected character                                |
-| B             | Print a space                                           |
-
-
-<br clear="right"/>
+| <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>L</td> <td>Cycle selected character left</td> </tr> <tr> <td>R</td> <td>Cycle selected character right</td> </tr> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Shift cursor left one</td> </tr> <tr> <td>Right</td> <td>Shift cursor right one</td> </tr> <tr> <td>Select</td> <td>Shift-like modifier key to skip 26 characters left/right</td> </tr> <tr> <td>Start + Select</td> <td>Save and exit file</td> </tr> <tr> <td>A</td> <td>Print selected character</td> </tr> <tr> <td>B</td> <td>Print a space</td> </tr> </tbody></table> | <img src="./assets/text editor demo.png" width="100%"> |
+| ------------- | ------------- |
 
 ## PocketFS Importer
 
 > Since creating and editing file trees on the GBA can be inconveient, I've provided a Python GUI program to import an entire file tree into the PocketFS.
 
-<img src="./assets/importer demo.png" width="75%" align="center">
+
 
 ### Limitations
 
-
-
-- Only supports folders and .txt files
-- Doesn't support '{' and '}'. Replaces them with '( and ')'
-- There's a maximum of 16 sub-directories/files within one parent
-- Each file should contain a maximum of 600, otherwise expect unintended effects
-
-<br clear="right"/>
+<table> <tr> <td style="text-align:left;"> <ul> <li style="text-align:left;">Only supports folders and .txt files</li> <li style="text-align:left;">Doesn't support '( and ')' characters. Replaces them with '&#40;' and '&#41;'</li> <li style="text-align:left;">There's a maximum of 16 sub-directories/files within one parent</li> <li style="text-align:left;">Each file should contain a maximum of 600, otherwise expect unintended effects</li> </ul> </td> <td> <img src="./assets/importer demo.png" width="100%"> </td> </tr></table>
 
 ## Contributing
 
