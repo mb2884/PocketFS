@@ -8,12 +8,12 @@
 #include "file.h"
 
 struct Directory {
-    char name[MAX_SIZE];
-    Directory* subdirectories[MAX_SIZE];
-    File* files[MAX_SIZE];
-    int subdirectory_count;
-    int file_count;
-    Directory* parent_directory;
+	char name[MAX_SIZE];
+	Directory *subdirectories[MAX_SIZE];
+	File *files[MAX_SIZE];
+	int subdirectory_count;
+	int file_count;
+	Directory *parent_directory;
 };
 
 Directory *createDirectory(const char *name, Directory *parentDirectory);
@@ -24,7 +24,7 @@ File **getAllFilesFromDirectory(Directory *directory);
 Directory **getAllSubdirectoriesFromDirectory(Directory *directory);
 void moveDirectory(Directory *directory, Directory *newParentDirectory);
 void saveDirectory(Directory *directory);
-Directory* loadDirectory();
+Directory *loadDirectory();
 void serialize(Directory *directory, char **address);
 Directory *deserialize(const char *serialized_str);
 

@@ -1,4 +1,5 @@
 build
+test
 pocketfs.elf
 pocketfs.sav
 .vscode

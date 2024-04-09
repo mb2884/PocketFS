@@ -1,7 +1,7 @@
 #include "dir.h"
-#include "utils.h"
 #include "file.h"
 #include "imported_data.h"
+#include "utils.h"
 #include <gba_console.h>
 #include <gba_input.h>
 #include <gba_interrupt.h>
@@ -172,7 +172,7 @@ void editFile(File *file) {
 
 void renameEntity(void *entity, int isFile) {
 	char *entityName = isFile ? ((File *)entity)->name : ((Directory *)entity)->name;
-	
+
 	char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>?/`";
 	int selectedLetter = 0;
 
@@ -210,7 +210,7 @@ void renameEntity(void *entity, int isFile) {
 			new_name[cursor_position] = '\0'; // Null-terminate the string
 		} else if (keys_pressed & KEY_B && cursor_position > 0) {
 			cursor_position--;
-			new_name[cursor_position] = '\0'; // Null-terminate the string
+			new_name[cursor_position] = '\0';  // Null-terminate the string
 		} else if (keys_pressed & KEY_START) { // Save and exit
 			if (isFile) {
 				File *file = (File *)entity;

@@ -1,6 +1,6 @@
 #include "dir.h"
-#include "utils.h"
 #include "file.h"
+#include "utils.h"
 #include <gba.h>
 #include <stdbool.h>
 #include <stdio.h>
