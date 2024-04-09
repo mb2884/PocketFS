@@ -44,13 +44,11 @@ mgba -4 pocketfs.gba
 
 <h4>Within the file browser</h4>
     
-| <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Back out of directory</td> </tr> <tr> <td>Right</td> <td>Enter a directory/edit a file</td> </tr> <tr> <td>B</td> <td>Create a directory here</td> </tr> <tr> <td>A</td> <td>Create a file here</td> </tr> <tr> <td>Select</td> <td>Delete highlighted directory/file</td> </tr> <tr> <td>Start</td> <td>Save all</td> </tr> <tr> <td>L</td> <td>Rename directory/file</td> </tr> </tbody></table> | <img src="./assets/fs demo.png" width="100%"> |
-| ------------- | ------------- |
+<table> <tr> <td style="text-align:left;"> <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Back out of directory</td> </tr> <tr> <td>Right</td> <td>Enter a directory/edit a file</td> </tr> <tr> <td>B</td> <td>Create a directory here</td> </tr> <tr> <td>A</td> <td>Create a file here</td> </tr> <tr> <td>Select</td> <td>Delete highlighted directory/file</td> </tr> <tr> <td>Start</td> <td>Save all</td> </tr> <tr> <td>L</td> <td>Rename directory/file</td> </tr> </tbody> </table> </td> <td> <img src="./assets/fs demo.png" width="100%"> </td> </tr></table>
 
 <h4>Within the text editor</h4>
 
-| <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>L</td> <td>Cycle selected character left</td> </tr> <tr> <td>R</td> <td>Cycle selected character right</td> </tr> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Shift cursor left one</td> </tr> <tr> <td>Right</td> <td>Shift cursor right one</td> </tr> <tr> <td>Select</td> <td>Shift-like modifier key to skip 26 characters left/right</td> </tr> <tr> <td>Start + Select</td> <td>Save and exit file</td> </tr> <tr> <td>A</td> <td>Print selected character</td> </tr> <tr> <td>B</td> <td>Print a space</td> </tr> </tbody></table> | <img src="./assets/text editor demo.png" width="100%"> |
-| ------------- | ------------- |
+<table> <tr> <td style="text-align:left;"> <table> <thead> <tr> <th>Button</th> <th>Function</th> </tr> </thead> <tbody> <tr> <td>L</td> <td>Cycle selected character left</td> </tr> <tr> <td>R</td> <td>Cycle selected character right</td> </tr> <tr> <td>Up</td> <td>Shift cursor up one</td> </tr> <tr> <td>Down</td> <td>Shift cursor down one</td> </tr> <tr> <td>Left</td> <td>Shift cursor left one</td> </tr> <tr> <td>Right</td> <td>Shift cursor right one</td> </tr> <tr> <td>Select</td> <td>Shift-like modifier key to skip 26 characters left/right</td> </tr> <tr> <td>Start + Select</td> <td>Save and exit file</td> </tr> <tr> <td>A</td> <td>Print selected character</td> </tr> <tr> <td>B</td> <td>Print a space</td> </tr> </tbody> </table> </td> <td> <img src="./assets/text editor demo.png" width="100%"> </td> </tr></table>
 
 ## PocketFS Importer
 
