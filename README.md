@@ -52,13 +52,13 @@ mgba -4 pocketfs.gba
 
 ## PocketFS Importer
 
-> Since creating and editing file trees on the GBA can be inconveient, I've provided a Python GUI program to import an entire file tree into the PocketFS.
+> Since creating and editing file trees on the GBA can be inconveient, I've provided a Python GUI program to import entire file trees into the PocketFS.
 
 
 
 ### Limitations
 
-<table> <tr> <td style="text-align:left;"> <ul> <li style="text-align:left;">Only supports folders and .txt files</li> <li style="text-align:left;">Doesn't support '( and ')' characters. Replaces them with '&#40;' and '&#41;'</li> <li style="text-align:left;">There's a maximum of 16 sub-directories/files within one parent</li> <li style="text-align:left;">Each file should contain a maximum of 600, otherwise expect unintended effects</li> </ul> </td> <td> <img src="./assets/importer demo.png" width="100%"> </td> </tr></table>
+<table> <tr> <td style="text-align:left;"> <ul> <li style="text-align:left;">Only supports folders and .txt files</li> <li style="text-align:left;">Doesn't support '{' and '}' characters. Replaces them with '&#40;' and '&#41;'</li> <li style="text-align:left;">There's a maximum of 16 sub-directories/files within one parent</li> <li style="text-align:left;">Each file should contain a maximum of 600, otherwise expect unintended effects</li> </ul> </td> <td> <img src="./assets/importer demo.png" width="100%"> </td> </tr></table>
 
 ## Contributing
 
