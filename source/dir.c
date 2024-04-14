@@ -15,13 +15,13 @@
 #define MAX_SIZE 1000
 
 // Function to change memory mode
-inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
-	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
-	*unlockAddress = 0xA55A;
-	*unlockAddress = 0xA55A;
-	*unlockAddress = mode;
-	*unlockAddress = mode;
-}
+// inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
+// 	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
+// 	*unlockAddress = 0xA55A;
+// 	*unlockAddress = 0xA55A;
+// 	*unlockAddress = mode;
+// 	*unlockAddress = mode;
+// }
 
 // Function to create a directory
 Directory *createDirectory(const char *name, Directory *parentDirectory) {
@@ -227,11 +227,11 @@ void saveDirectory(Directory *directory) {
 
 	char *address = (char *)0x0E000000;
 	// Wipe RAM before writing
-	_SC_changeMode(SC_MODE_RAM);
+	// _SC_changeMode(SC_MODE_RAM);
 	memset((void *)address, 0xFFFF, 0x0E00FFFF - 0x0E000000 + 1);
 	address += 0x0E00FFFF - 0x0E000000 + 1;
 	serialize(directory, &address);
-	_SC_changeMode(SC_MODE_MEDIA);
+	// _SC_changeMode(SC_MODE_MEDIA);
 }
 
 // Function to load the serialized directory structure from address 0x0E000000

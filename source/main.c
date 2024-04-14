@@ -16,22 +16,9 @@
 #define MAX_NAME_LENGTH 27
 #define MAX_CHARS 599
 
-#define USE_SAVE 0
-#define USE_IMPORT 1
+#define USE_SAVE 1
+#define USE_IMPORT 0
 
-// Values for changing mode
-#define SC_MODE_RAM 0x5
-#define SC_MODE_MEDIA 0x3
-#define SC_MODE_RAM_RO 0x1
-
-// Function to change memory mode
-inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
-	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
-	*unlockAddress = 0xA55A;
-	*unlockAddress = 0xA55A;
-	*unlockAddress = mode;
-	*unlockAddress = mode;
-}
 
 // Perform necessary setup
 void setup() {
