@@ -1,16 +1,17 @@
 #ifndef DIR_H
 #define DIR_H
 
-#define MAX_SUBDIRECTORIES 128
+#define MAX_ITEMS 128
 #define MAX_FILES 128
 #define MAX_SIZE 1000
+#define MAX_NAME_SIZE 100
 
 #include "file.h"
 
 struct Directory {
-	char name[MAX_SIZE];
-	Directory *subdirectories[MAX_SIZE];
-	File *files[MAX_SIZE];
+	char name[MAX_NAME_SIZE];
+	Directory *subdirectories[MAX_ITEMS];
+	File *files[MAX_ITEMS];
 	int subdirectory_count;
 	int file_count;
 	Directory *parent_directory;

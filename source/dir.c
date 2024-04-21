@@ -12,8 +12,6 @@
 #define SC_MODE_MEDIA 0x3
 #define SC_MODE_RAM_RO 0x1
 
-#define MAX_SIZE 1000
-
 // Function to change memory mode
 // inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
 // 	vu16 *unlockAddress = (vu16 *)0x09FFFFFE;
@@ -149,8 +147,8 @@ Directory *deserialize(const char *serialized_str) {
 	Directory *root_dir = NULL;
 	Directory *parent_dir = NULL;
 	File *current_file = NULL;
-	char newDirName[MAX_SIZE];
-	char newFileName[MAX_SIZE];
+	char newDirName[MAX_NAME_SIZE];
+	char newFileName[MAX_NAME_SIZE];
 	char newFileContents[MAX_SIZE];
 	int newFileContentsIndex = 0;
 

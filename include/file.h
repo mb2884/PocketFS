@@ -1,11 +1,12 @@
 #ifndef FILE_H
 #define FILE_H
 #define MAX_SIZE 1000
+#define MAX_NAME_SIZE 100
 
 typedef struct Directory Directory;
 
 typedef struct {
-	char name[MAX_SIZE];
+	char name[MAX_NAME_SIZE];
 	char data[MAX_SIZE];
 	int size;
 	int capacity;
