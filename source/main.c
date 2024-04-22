@@ -16,7 +16,7 @@
 #define MAX_NAME_LENGTH 27
 #define MAX_CHARS 599
 
-#define USE_SAVE 0
+#define USE_SAVE 1
 #define USE_IMPORT 0
 
 
@@ -72,7 +72,7 @@ void printCursor(Directory *directory, int cursor_position, int *selectedIsFile)
 void editFile(File *file) {
 	clearScr();
 
-	char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>?/`";
+	char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]|;':,.<>?/`";
 	int selectedLetter = 0;
 
 	int cursor_position = file->cursor_position;

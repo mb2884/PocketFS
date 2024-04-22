@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QMainWindow, QGridLayout, QFrame, QSizePolicy, QHBoxLayout, QCheckBox, QFileDialog, QMessageBox
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, QSize
@@ -25,10 +26,20 @@ def serialize_directory(directory_path):
 
 
 def select_directory():
-    directory_path = QFileDialog.getExistingDirectory(None, "Select Directory")
+    #directory_path = QFileDialog.getExistingDirectory(None, "Select Directory")
+    directory_path = "C:/Users/mbarr/Code/pocketfs/test"
+    start_time = time.time()
     if directory_path:
-        serialized_str = serialize_directory(directory_path)
-        save_to_file(serialized_str)
+        total_time = 0
+        for _ in range(1):
+            start_time = time.time()
+            serialized_str = serialize_directory(directory_path)
+            
+            end_time = time.time()
+            total_time += end_time - start_time
+        #save_to_file(serialized_str)
+        average_time = total_time / 1
+        print(f"Average time: {average_time:.4f} seconds")
 
 
 def save_to_file(serialized_str):

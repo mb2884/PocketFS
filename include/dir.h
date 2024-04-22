@@ -3,8 +3,8 @@
 
 #define MAX_ITEMS 128
 #define MAX_FILES 128
-#define MAX_SIZE 1000
-#define MAX_NAME_SIZE 100
+#define MAX_SIZE 1024
+#define MAX_NAME_SIZE 128
 
 #include "file.h"
 

@@ -1,7 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
-#define MAX_SIZE 1000
-#define MAX_NAME_SIZE 100
+#define MAX_SIZE 1024
+#define MAX_NAME_SIZE 128
 
 typedef struct Directory Directory;
 
@@ -18,6 +18,7 @@ File *createFile(char *name, Directory *parentDirectory);
 void writeFile(File *file, const char *data);
 void appendFile(File *file, const char *data);
 void insertAtPosition(File *file, const char *data, int position);
+void overwriteAtPosition(File *file, const char *data, int position);
 void deleteFile(File *file);
 void renameFile(File *file, char *newName);
 void copyFile(File *sourceFile, Directory *destinationDirectory);
