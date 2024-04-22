@@ -8,9 +8,9 @@
 #include <string.h>
 
 // Values for changing mode
-#define SC_MODE_RAM 0x5
-#define SC_MODE_MEDIA 0x3
-#define SC_MODE_RAM_RO 0x1
+// #define SC_MODE_RAM 0x5
+// #define SC_MODE_MEDIA 0x3
+// #define SC_MODE_RAM_RO 0x1
 
 // Function to change memory mode
 // inline void __attribute__((optimize("O0"))) _SC_changeMode(u16 mode) {
