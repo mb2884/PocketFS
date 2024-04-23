@@ -165,9 +165,16 @@ Directory *deserialize(const char *serialized_str) {
 			// Scanned in directory name
 			int j = 0;
 			while (serialized_str[i] != '{') {
-				newDirName[j] = serialized_str[i];
-				i++;
-				j++;
+				if (serialized_str[i] != ' ') {
+					newDirName[j] = serialized_str[i];
+					i++;
+					j++;
+				} else {
+					i++;
+				}
+
+				// i++;
+				// j++;
 			}
 			newDirName[j] = '\0';
 

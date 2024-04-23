@@ -16,7 +16,7 @@
 #define MAX_NAME_LENGTH 27
 #define MAX_CHARS 599
 
-#define USE_SAVE 1
+#define USE_SAVE 0
 #define USE_IMPORT 0
 
 
