@@ -24,4 +24,4 @@ void renameFile(File *file, char *newName);
 void copyFile(File *sourceFile, Directory *destinationDirectory);
 void moveFile(File *file, Directory *newParentDirectory);
 
-#endif /* FILE_H */
+#endif

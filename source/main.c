@@ -33,6 +33,7 @@ void setup() {
 	REG_DISPCNT = MODE_0 | BG0_ON;
 	BG_PALETTE[0] = RGB5(4, 4, 5);
 }
+
 // Function to print all subdirectories and files and allow selection
 void printCursor(Directory *directory, int cursor_position, int *selectedIsFile) {
 	if (!directory) {
@@ -69,6 +70,7 @@ void printCursor(Directory *directory, int cursor_position, int *selectedIsFile)
 	}
 }
 
+// Function to enter text for a file
 void editFile(File *file) {
 	clearScr();
 
@@ -157,6 +159,7 @@ void editFile(File *file) {
 	}
 }
 
+// Function to rename a directory or file
 void renameEntity(void *entity, int isFile) {
 	char *entityName = isFile ? ((File *)entity)->name : ((Directory *)entity)->name;
 
@@ -267,10 +270,8 @@ int main(void) {
 		} else if (keys_pressed & KEY_SELECT) {
 			if (cursor_position >= 0 && cursor_position < totalEntries) {
 				if (selectedIsFile) {
-					// Handle file deletion
 					deleteFile(currentDirectory->files[cursor_position - currentDirectory->subdirectory_count]);
 				} else {
-					// Handle directory deletion
 					deleteDirectory(currentDirectory->subdirectories[cursor_position]);
 				}
 				if (cursor_position != 0) {
